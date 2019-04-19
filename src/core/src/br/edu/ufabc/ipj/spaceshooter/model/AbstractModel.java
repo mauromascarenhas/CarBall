@@ -2,9 +2,9 @@ package br.edu.ufabc.ipj.spaceshooter.model;
 
 import br.edu.ufabc.ipj.spaceshooter.core.GameObject;
 
-public abstract class AbstractModel {
-    public boolean collidable;
+public abstract class AbstractModel {    
     public boolean moveable;
+    public boolean collidable;
 	
     public AbstractModel(boolean collidable, boolean moveable) {
         this.collidable = collidable;

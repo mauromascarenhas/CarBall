@@ -8,6 +8,8 @@ import com.badlogic.gdx.graphics.g3d.utils.ModelBuilder;
 import br.edu.ufabc.ipj.spaceshooter.screen.BaseScreen;
 import br.edu.ufabc.ipj.spaceshooter.screen.LoadingScreen;
 import br.edu.ufabc.ipj.spaceshooter.screen.SpaceshipSelectionScreen;
+import br.edu.ufabc.ipj.spaceshooter.utils.Commands;
+import com.badlogic.gdx.Input;
 import com.badlogic.gdx.graphics.g3d.Model;
 
 
@@ -27,6 +29,7 @@ public class SpaceShooterGame extends Game implements InputProcessor {
         
         assetManager.load("three_dimensional/scifi_cosair/cosair.g3db", Model.class);
         assetManager.load("three_dimensional/scifi_spacecraft/SciFi_Fighter.g3db", Model.class);
+        assetManager.load("three_dimensional/scifi_cargostarship/scifi_cargostarship.g3db", Model.class);
         
         //Enables mouse interaction
         Gdx.input.setInputProcessor(this);
@@ -46,13 +49,51 @@ public class SpaceShooterGame extends Game implements InputProcessor {
 
     @Override
     public boolean keyDown(int i) {
-        // Non implemented method
+        switch(i){
+            case Input.Keys.UP:
+                Commands.set[Commands.Command.UP.getValue()] = true;
+                return true;
+            case Input.Keys.DOWN:
+                Commands.set[Commands.Command.DOWN.getValue()] = true;
+                return true;
+            case Input.Keys.LEFT:
+                Commands.set[Commands.Command.LEFT.getValue()] = true;
+                return true;
+            case Input.Keys.RIGHT:
+                Commands.set[Commands.Command.RIGHT.getValue()] = true;
+                return true;
+            case Input.Keys.SPACE:
+                Commands.set[Commands.Command.SHOT.getValue()] = true;
+                return true;
+            case Input.Keys.D:
+                Commands.set[Commands.Command.DEBUG.getValue()] = true;
+                return true;
+        }
         return false;
     }
 
     @Override
     public boolean keyUp(int i) {
-        // Non implemented method
+        switch(i){
+            case Input.Keys.UP:
+                Commands.set[Commands.Command.UP.getValue()] = false;
+                return true;
+            case Input.Keys.DOWN:
+                Commands.set[Commands.Command.DOWN.getValue()] = false;
+                return true;
+            case Input.Keys.LEFT:
+                Commands.set[Commands.Command.LEFT.getValue()] = false;
+                return true;
+            case Input.Keys.RIGHT:
+                Commands.set[Commands.Command.RIGHT.getValue()] = false;
+                return true;
+            case Input.Keys.SPACE:
+                Commands.set[Commands.Command.SHOT.getValue()] = false;
+                return true;
+            case Input.Keys.D:
+                Commands.set[Commands.Command.DEBUG.getValue()] = false;
+                return true;
+        }
         return false;
     }
 

@@ -7,19 +7,20 @@ import com.badlogic.gdx.graphics.g3d.Model;
 import com.badlogic.gdx.graphics.g3d.attributes.ColorAttribute;
 import com.badlogic.gdx.math.Vector3;
 
-public class SciFiFighter extends AbstractModel{
-    
+public class SciFiCargoSarship extends AbstractModel{
+        
     private GameObject object;
     
-    public SciFiFighter(){
+    public SciFiCargoSarship(){
         this(true);
     }
     
-    public SciFiFighter(boolean visible){
+    public SciFiCargoSarship(boolean visible){
         super(true, true);
         
-        Model mIdle = SpaceShooterGame.assetManager.get("three_dimensional/scifi_spacecraft/SciFi_Fighter.g3db");
+        Model mIdle = SpaceShooterGame.assetManager.get("three_dimensional/scifi_cargostarship/scifi_cargostarship.g3db");
         object = new GameObject(mIdle, visible);
+        object.transform.scale(0.05f, 0.05f, 0.05f);
         
         for (Material m : object.materials)
             m.remove(ColorAttribute.Emissive);

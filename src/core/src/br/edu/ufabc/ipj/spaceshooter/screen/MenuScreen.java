@@ -6,10 +6,10 @@ import com.badlogic.gdx.math.Matrix4;
 
 public class MenuScreen extends BaseScreen {
 
-    private Texture texture;
-    private Matrix4 viewMatrix;
-    private Matrix4 transMatrix;
-    private SpriteBatch spriteBatch;
+    private final Texture texture;
+    private final Matrix4 viewMatrix;
+    private final Matrix4 transMatrix;
+    private final SpriteBatch spriteBatch;
     
     public MenuScreen(String id){
         super(id);
