@@ -6,6 +6,7 @@ import com.badlogic.gdx.InputProcessor;
 import com.badlogic.gdx.assets.AssetManager;
 import com.badlogic.gdx.graphics.g3d.utils.ModelBuilder;
 import br.edu.ufabc.ipj.spaceshooter.screen.BaseScreen;
+import br.edu.ufabc.ipj.spaceshooter.screen.GameScreen;
 import br.edu.ufabc.ipj.spaceshooter.screen.LoadingScreen;
 import br.edu.ufabc.ipj.spaceshooter.screen.SpaceshipSelectionScreen;
 import br.edu.ufabc.ipj.spaceshooter.utils.Commands;
@@ -45,6 +46,7 @@ public class SpaceShooterGame extends Game implements InputProcessor {
         String currentId = currentScreen.getId();
         if (currentScreen.isDone())
             if(currentId.equals("loading")) currentScreen = new SpaceshipSelectionScreen("selection");
+            else if (currentId.equals("selection")) currentScreen = new GameScreen("game", ((SpaceshipSelectionScreen)currentScreen).getSelected());
     }
 
     @Override

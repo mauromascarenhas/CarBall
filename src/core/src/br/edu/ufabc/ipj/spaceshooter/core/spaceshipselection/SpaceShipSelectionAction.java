@@ -1,4 +1,4 @@
-package br.edu.ufabc.ipj.spaceshooter.core;
+package br.edu.ufabc.ipj.spaceshooter.core.spaceshipselection;
 
 import br.edu.ufabc.ipj.spaceshooter.SpaceShooterGame;
 import br.edu.ufabc.ipj.spaceshooter.model.AbstractModel;
@@ -7,11 +7,14 @@ import br.edu.ufabc.ipj.spaceshooter.model.SciFiCargoSarship;
 import br.edu.ufabc.ipj.spaceshooter.model.SciFiCosair;
 import br.edu.ufabc.ipj.spaceshooter.model.SciFiFighter;
 import br.edu.ufabc.ipj.spaceshooter.utils.Commands;
+import br.edu.ufabc.ipj.spaceshooter.utils.ModelSelector;
 import com.badlogic.gdx.graphics.g3d.Material;
 import com.badlogic.gdx.graphics.g3d.attributes.ColorAttribute;
 import com.badlogic.gdx.utils.Array;
 
 public class SpaceShipSelectionAction {
+    
+    public ModelSelector currentSelection;
     
     private boolean hadCommand;
     
@@ -19,6 +22,8 @@ public class SpaceShipSelectionAction {
     
     public SpaceShipSelectionAction(){
         hadCommand = false;
+        
+        currentSelection = ModelSelector.SCIFI_FIGHTER;
         
         objects = new Array<AbstractModel>();
         
@@ -65,8 +70,8 @@ public class SpaceShipSelectionAction {
             if (objects.get(i).getGameObject().isVisible()) break;
         
         objects.get(i).getGameObject().setVisible(false);
-        if (command == Commands.Command.RIGHT)
-            objects.get(++i >= objects.size ? 1 : i).getGameObject().setVisible(true);
-        else objects.get(--i == 0 ? objects.size - 1 : i).getGameObject().setVisible(true);
+        if (command == Commands.Command.RIGHT) currentSelection = ModelSelector.fromInteger(++i >= objects.size ? 1 : i);
+        else currentSelection = ModelSelector.fromInteger(--i == 0 ? objects.size - 1 : i);
+        objects.get(currentSelection.getValue()).getGameObject().setVisible(true);
     }
 }
