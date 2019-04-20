@@ -131,7 +131,7 @@ public class GameObject extends ModelInstance{
                         position.cpy().add(maxOriginal));
         ctrOriginal.add(position.cpy());
         
-        position.y = (boundingBox.getHeight()/2);
+        position.y = (boundingBox.getHeight() / 2);
         boxInstance.transform.setToTranslation(position);
     }
 	

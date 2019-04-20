@@ -7,20 +7,20 @@ import com.badlogic.gdx.graphics.g3d.Model;
 import com.badlogic.gdx.graphics.g3d.attributes.ColorAttribute;
 import com.badlogic.gdx.math.Vector3;
 
-public class SciFiCargoSarship extends AbstractModel{
+public class Asteroid extends AbstractModel{
         
     private GameObject object;
     
-    public SciFiCargoSarship(){
+    public Asteroid(){
         this(true);
     }
     
-    public SciFiCargoSarship(boolean visible){
+    public Asteroid(boolean visible){
         super(true, true);
         
-        Model mIdle = SpaceShooterGame.assetManager.get("three_dimensional/scifi_cargostarship/scifi_cargostarship.g3db");
+        Model mIdle = SpaceShooterGame.assetManager.get("three_dimensional/asteroid/Asteroid.g3db");
         object = new GameObject(mIdle, visible);
-        object.transform.scale(0.05f, 0.05f, 0.05f);
+        object.transform.scale(0.009f, 0.009f, 0.009f);
         
         for (Material m : object.materials)
             m.remove(ColorAttribute.Emissive);
@@ -31,7 +31,7 @@ public class SciFiCargoSarship extends AbstractModel{
         object.update(delta);
         
         if (this.isMoveable())
-            object.updateBoundingBox();        
+            object.updateBoundingBox();
     }
 
     @Override

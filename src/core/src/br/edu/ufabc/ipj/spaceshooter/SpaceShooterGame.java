@@ -28,6 +28,8 @@ public class SpaceShooterGame extends Game implements InputProcessor {
         
         assetManager.load("three_dimensional/pedestal/tech_pedestal.g3db", Model.class);
         
+        assetManager.load("three_dimensional/asteroid/Asteroid.g3db", Model.class);
+        
         assetManager.load("three_dimensional/scifi_cosair/cosair.g3db", Model.class);
         assetManager.load("three_dimensional/scifi_spacecraft/SciFi_Fighter.g3db", Model.class);
         assetManager.load("three_dimensional/scifi_cargostarship/scifi_cargostarship.g3db", Model.class);
