@@ -25,3 +25,7 @@ hs_err_pid*
 /base_game/GearsOfBronx/GearsOfBronx-master/.nb-gradle/
 /base_game/GearsOfBronx/GearsOfBronx-master/core/build/
 /base_game/GearsOfBronx/GearsOfBronx-master/desktop/build/
+
+# Do not ignore
+!/badlogic_tools/*
+!/base_assets/*
