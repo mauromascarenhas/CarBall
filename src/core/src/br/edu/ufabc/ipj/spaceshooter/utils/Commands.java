@@ -6,8 +6,7 @@ public class Commands{
         DOWN(1),
         LEFT(2),
         RIGHT(3),
-        SHOT(4),
-        DEBUG(5);
+        SHOT(4);
 
         private final int value;
 
@@ -23,8 +22,7 @@ public class Commands{
             false,      // DOWN
             false,      // LEFT
             false,      // RIGHT
-            false,      // SHOT
-            false   };  // DEBUG
+            false   };  // SHOT
     
     public static boolean noCommands(){
         return !hasCommand();

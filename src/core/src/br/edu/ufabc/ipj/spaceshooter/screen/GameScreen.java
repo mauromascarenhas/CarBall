@@ -19,6 +19,7 @@ public class GameScreen extends BaseScreen{
     @Override
     public void update(float delta) {
         gameAction.update(delta);
+        this.setDone(gameAction.isDone);
     }
 
     @Override

@@ -1,6 +1,6 @@
 package br.edu.ufabc.ipj.spaceshooter.core.gamelogic;
 
-import br.edu.ufabc.ipj.spaceshooter.SpaceShooterGame;
+import br.edu.ufabc.ipj.spaceshooter.core.GameObject;
 import br.edu.ufabc.ipj.spaceshooter.model.AbstractModel;
 import br.edu.ufabc.ipj.spaceshooter.model.Asteroid;
 import br.edu.ufabc.ipj.spaceshooter.model.SciFiCargoSarship;
@@ -15,9 +15,44 @@ import com.badlogic.gdx.utils.Array;
 
 public class GameAction {
     
+    // Set done on destroy
+    public boolean isDone;
+    
+    // Objects scale
+    private final float shotScale = 0;
+    private final float asteroidScale;
+    private final float spacecraftScale;
+    
+    // Objects speed
+    private final float shotSpeed = 0;
+    private final float asteroidSpeed;
+    private final float spacecraftSpeed;
+    
+    // Game logic variables
+    public int lives;
+    private int invulnerabilityCount;
+    
+    public long score;
+    
+    private float shotTimer;
+    private float invulnerabilityTimer;
+    
+    private boolean isInvulnerable;
+            
     protected Array<AbstractModel> objects;
     
     public GameAction(ModelSelector selected){
+        this.isDone = false;
+        
+        this.score = 0;
+        this.lives = 3;
+        
+        this.shotTimer = 0;
+        this.invulnerabilityCount = 0;
+        this.invulnerabilityTimer = 0;
+        
+        this.isInvulnerable = false;
+        
         objects = new Array<AbstractModel>();
         
         //Load models in here
@@ -25,16 +60,28 @@ public class GameAction {
             case SCIFI_COSAIR:
                 objects.add(new SciFiCosair());
                 objects.first().getGameObject().transform.rotate(Vector3.Y, 180);
+                spacecraftSpeed = SciFiCosair.getDefaultSpeed();
+                spacecraftScale = SciFiCosair.DEFAULT_SCALE;
                 break;
             case SCIFI_FIGHTER:
                 objects.add(new SciFiFighter());
                 objects.first().getGameObject().transform.rotate(Vector3.Y, 180);
+                spacecraftSpeed = SciFiFighter.getDefaultSpeed();
+                spacecraftScale = SciFiFighter.DEFAULT_SCALE;
                 break;
             case SCIFI_STARSHIP:
                 objects.add(new SciFiCargoSarship());
                 objects.first().getGameObject().transform.rotate(Vector3.Y, 180);
+                spacecraftSpeed = SciFiCargoSarship.getDefaultSpeed();
+                spacecraftScale = SciFiCargoSarship.DEFAULT_SCALE;
                 break;
+            default:
+                spacecraftSpeed = 8;
+                spacecraftScale = 1;
         }
+        
+        asteroidScale = Asteroid.DEFAULT_SCALE;
+        asteroidSpeed = Asteroid.getDefaultSpeed();
         
         objects.add(new Asteroid());
         
@@ -42,17 +89,35 @@ public class GameAction {
             for (Material mat : obj.getGameObject().materials)
                 mat.remove(ColorAttribute.Emissive);
         
-        objects.get(1).getGameObject().transform.translate(0, 0, -300.0f / objects.get(1).getGameObject().transform.getScaleZ());
+        objects.get(1).getGameObject().transform.translate(0, 0, -300.0f / asteroidScale);
     }
     
     public void update(float delta){
         for (AbstractModel o : objects)
             o.update(delta);
         
+        if (lives > 0) score += delta * 100;
+        
+        if (this.isInvulnerable){
+            this.invulnerabilityTimer += delta;
+            if (this.invulnerabilityTimer >= 0.5f){
+                this.invulnerabilityTimer = 0;
+                
+                GameObject spaceCraft = objects.first().getGameObject();
+                spaceCraft.setVisible(!spaceCraft.isVisible());
+                
+                this.invulnerabilityCount++;
+            }
+            
+            this.isInvulnerable = this.invulnerabilityCount != 5;
+            if (!this.isInvulnerable) this.invulnerabilityCount = 0;
+        }
+        
         Vector3 cPos = new Vector3();
         if (objects.size > 1){
-            objects.get(1).getGameObject().transform.translate(0, 0, +1 / objects.get(1).getGameObject().transform.getScaleZ());
+            objects.get(1).getGameObject().transform.translate(0, 0, asteroidSpeed / asteroidScale);
             objects.get(1).getGameObject().transform.getTranslation(cPos);
+            
             System.out.println(cPos);
             if (cPos.z > 26.0f){
                 objects.removeIndex(1);
@@ -60,16 +125,30 @@ public class GameAction {
                 objects.add(new Asteroid());
                 for (Material mat : objects.get(objects.size - 1).getGameObject().materials)
                     mat.remove(ColorAttribute.Emissive);
-                objects.get(objects.size - 1).getGameObject().transform.translate(((float)Math.random() * 80) - 40,
-                                                                                    0, -300.0f / objects.get(1).getGameObject().transform.getScaleZ());
+                objects.get(objects.size - 1).getGameObject().transform.translate((float)(Math.random() * 61.0 - 30.0) / asteroidScale,
+                                                                                    0, -300.0f / asteroidScale);
             }
         }
+
+        objects.first().getGameObject().transform.getTranslation(cPos);
+        if (Commands.hasCommand(Commands.Command.LEFT) && cPos.x > -25) 
+            objects.first().getGameObject().transform.translate(spacecraftSpeed * delta / spacecraftScale, 0, 0);
+        else if (Commands.hasCommand(Commands.Command.RIGHT) && cPos.x < 25) 
+            objects.first().getGameObject().transform.translate(-spacecraftSpeed * delta / spacecraftScale, 0, 0);
         
-        if (Commands.hasCommand(Commands.Command.LEFT)) 
-            objects.first().getGameObject().transform.translate(10.0f * delta / objects.first().getGameObject().transform.getScaleX(), 0, 0);
-        else if (Commands.hasCommand(Commands.Command.RIGHT)) 
-            objects.first().getGameObject().transform.translate(-10.0f * delta / objects.first().getGameObject().transform.getScaleX(), 0, 0);
-        
-        SpaceShooterGame.DEBUG = Commands.set[Commands.Command.DEBUG.getValue()];
+        if (!this.isInvulnerable && this.lives > 0){
+            if (objects.get(1).collidesWith(objects.get(0)))
+                if (this.lives == 1){
+                    objects.first().getGameObject().setVisible(false);
+                    this.lives--;
+                }
+                else {
+                    objects.first().getGameObject().setVisible(false);
+                    this.invulnerabilityTimer = 0;
+                    this.isInvulnerable = true;
+                    this.lives--;
+                }
+        }
+        else if (this.lives == 0 && Commands.hasCommand(Commands.Command.SHOT)) this.isDone = true;
     }
 }

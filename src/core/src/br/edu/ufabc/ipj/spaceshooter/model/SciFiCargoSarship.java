@@ -9,6 +9,8 @@ import com.badlogic.gdx.math.Vector3;
 
 public class SciFiCargoSarship extends AbstractModel{
         
+    public static final float DEFAULT_SCALE = 0.045f;
+    
     private GameObject object;
     
     public SciFiCargoSarship(){
@@ -20,7 +22,9 @@ public class SciFiCargoSarship extends AbstractModel{
         
         Model mIdle = SpaceShooterGame.assetManager.get("three_dimensional/scifi_cargostarship/scifi_cargostarship.g3db");
         object = new GameObject(mIdle, visible);
-        object.transform.scale(0.05f, 0.05f, 0.05f);
+        
+        object.transform.scale(DEFAULT_SCALE, DEFAULT_SCALE, DEFAULT_SCALE);
+        object.updateBoxScale(DEFAULT_SCALE);
         
         for (Material m : object.materials)
             m.remove(ColorAttribute.Emissive);
@@ -44,4 +48,7 @@ public class SciFiCargoSarship extends AbstractModel{
         object.setAngle(30 * delta);
     }
     
+    public static float getDefaultSpeed(){
+        return 6.0f;
+    }
 }

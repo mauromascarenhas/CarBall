@@ -9,6 +9,8 @@ import com.badlogic.gdx.math.Vector3;
 
 public class SciFiCosair extends AbstractModel{
         
+    public static final float DEFAULT_SCALE = 0.007f;
+    
     private GameObject object;
     
     public SciFiCosair(){
@@ -20,7 +22,9 @@ public class SciFiCosair extends AbstractModel{
         
         Model mIdle = SpaceShooterGame.assetManager.get("three_dimensional/scifi_cosair/cosair.g3db");
         object = new GameObject(mIdle, visible);
-        object.transform.scale(0.009f, 0.009f, 0.009f);
+        
+        object.updateBoxScale(DEFAULT_SCALE);
+        object.transform.scale(DEFAULT_SCALE, DEFAULT_SCALE, DEFAULT_SCALE);
         object.transform.rotate(Vector3.Y, 180);
         
         for (Material m : object.materials)
@@ -45,4 +49,7 @@ public class SciFiCosair extends AbstractModel{
         object.setAngle(30 * delta);
     }
     
+    public static float getDefaultSpeed(){
+        return -15;
+    }
 }

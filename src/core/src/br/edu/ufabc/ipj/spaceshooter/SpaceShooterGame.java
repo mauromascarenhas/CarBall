@@ -49,6 +49,7 @@ public class SpaceShooterGame extends Game implements InputProcessor {
         if (currentScreen.isDone())
             if(currentId.equals("loading")) currentScreen = new SpaceshipSelectionScreen("selection");
             else if (currentId.equals("selection")) currentScreen = new GameScreen("game", ((SpaceshipSelectionScreen)currentScreen).getSelected());
+            else if (currentId.equals("game")) currentScreen = new SpaceshipSelectionScreen("selection");
     }
 
     @Override
@@ -68,9 +69,6 @@ public class SpaceShooterGame extends Game implements InputProcessor {
                 return true;
             case Input.Keys.SPACE:
                 Commands.set[Commands.Command.SHOT.getValue()] = true;
-                return true;
-            case Input.Keys.D:
-                Commands.set[Commands.Command.DEBUG.getValue()] = true;
                 return true;
         }
         return false;
@@ -93,9 +91,6 @@ public class SpaceShooterGame extends Game implements InputProcessor {
                 return true;
             case Input.Keys.SPACE:
                 Commands.set[Commands.Command.SHOT.getValue()] = false;
-                return true;
-            case Input.Keys.D:
-                Commands.set[Commands.Command.DEBUG.getValue()] = false;
                 return true;
         }
         return false;

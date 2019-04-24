@@ -1,12 +1,12 @@
 package br.edu.ufabc.ipj.spaceshooter.core.gamelogic;
 
-import br.edu.ufabc.ipj.spaceshooter.SpaceShooterGame;
 import br.edu.ufabc.ipj.spaceshooter.model.AbstractModel;
 import br.edu.ufabc.ipj.spaceshooter.utils.Utilities;
 import com.badlogic.gdx.Gdx;
 import com.badlogic.gdx.graphics.GL20;
 import com.badlogic.gdx.graphics.PerspectiveCamera;
 import com.badlogic.gdx.graphics.Texture;
+import com.badlogic.gdx.graphics.g2d.BitmapFont;
 import com.badlogic.gdx.graphics.g2d.SpriteBatch;
 import com.badlogic.gdx.graphics.g3d.Environment;
 import com.badlogic.gdx.graphics.g3d.ModelBatch;
@@ -22,8 +22,10 @@ public class GameRenderer {
     
     // Static content
     private final Texture texture;
+    private final Texture life_symb;
     private final Matrix4 viewMatrix;
     private final Matrix4 transMatrix;
+    private final BitmapFont bitmapFont;
     private final SpriteBatch spriteBatch;
     
     public GameRenderer(GameAction action){
@@ -31,6 +33,10 @@ public class GameRenderer {
         
         //Loads static content
         texture = new Texture("static_images/space_background_dark_2.jpg");
+        life_symb = new Texture("static_images/spacecraft_icon.png");
+        
+        bitmapFont = new BitmapFont(Gdx.files.internal("fonts/space_age.fnt"));
+        
         viewMatrix = new Matrix4();
         transMatrix = new Matrix4();
         spriteBatch = new SpriteBatch();
@@ -60,15 +66,18 @@ public class GameRenderer {
         spriteBatch.begin();
         spriteBatch.draw(texture, 0, 0, Utilities.GAME_WIDTH, Utilities.GAME_HEIGHT, 0, 0,
                             2048, 1152, false, false);
+        
+        for (int i = 0; i < gameAction.lives; ++i)
+            spriteBatch.draw(life_symb, (40 + i * 52f), 40, 50.0f, 50.0f, 0, 0, 512, 512, false, false);
+            
+        bitmapFont.getData().setScale(2.0f);
+        bitmapFont.draw(spriteBatch, String.format("SCORE : %d", gameAction.score), 50.0f, 650.0f);
         spriteBatch.end();
         
         modelBatch.begin(camera);
         for (AbstractModel o : gameAction.objects)
             if (o.getGameObject().isVisible()) modelBatch.render(o.getGameObject(), environment);
         
-        if (SpaceShooterGame.DEBUG)
-            for (AbstractModel o : gameAction.objects)
-                modelBatch.render(o.getGameObject().getBoxInstance(), environment);
         modelBatch.end();
         
         camera.update();

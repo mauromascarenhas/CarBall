@@ -58,8 +58,6 @@ public class SpaceShipSelectionAction {
                 ((SciFiCosair) o).rotateSelection(delta);
             else if (o instanceof SciFiCargoSarship)
                 ((SciFiCargoSarship) o).rotateSelection(delta);
-        
-        SpaceShooterGame.DEBUG = Commands.set[Commands.Command.DEBUG.getValue()];
     }
     
     private void swapSpaceship(Commands.Command command){

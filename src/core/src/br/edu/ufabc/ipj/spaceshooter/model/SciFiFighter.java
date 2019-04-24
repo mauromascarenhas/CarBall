@@ -9,6 +9,8 @@ import com.badlogic.gdx.math.Vector3;
 
 public class SciFiFighter extends AbstractModel{
     
+    public static float DEFAULT_SCALE = 1;
+    
     private GameObject object;
     
     public SciFiFighter(){
@@ -43,4 +45,7 @@ public class SciFiFighter extends AbstractModel{
         object.setAngle(30 * delta);
     }
     
+    public static float getDefaultSpeed(){
+        return 10.0f;
+    }
 }

@@ -9,6 +9,8 @@ import com.badlogic.gdx.math.Vector3;
 
 public class Asteroid extends AbstractModel{
         
+    public static final float DEFAULT_SCALE = 0.008f;
+    
     private GameObject object;
     
     public Asteroid(){
@@ -20,7 +22,8 @@ public class Asteroid extends AbstractModel{
         
         Model mIdle = SpaceShooterGame.assetManager.get("three_dimensional/asteroid/Asteroid.g3db");
         object = new GameObject(mIdle, visible);
-        object.transform.scale(0.009f, 0.009f, 0.009f);
+        object.transform.scale(DEFAULT_SCALE, DEFAULT_SCALE, DEFAULT_SCALE);
+        object.updateBoxScale(DEFAULT_SCALE);
         
         for (Material m : object.materials)
             m.remove(ColorAttribute.Emissive);
@@ -44,4 +47,7 @@ public class Asteroid extends AbstractModel{
         object.setAngle(30 * delta);
     }
     
+    public static float getDefaultSpeed(){
+        return 1;
+    }
 }
