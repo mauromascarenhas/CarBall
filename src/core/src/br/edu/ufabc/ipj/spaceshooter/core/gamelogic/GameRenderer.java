@@ -75,9 +75,10 @@ public class GameRenderer {
         spriteBatch.end();
         
         modelBatch.begin(camera);
+        for (AbstractModel o : gameAction.missiles)
+            if (o.getGameObject().isVisible()) modelBatch.render(o.getGameObject(), environment);
         for (AbstractModel o : gameAction.objects)
             if (o.getGameObject().isVisible()) modelBatch.render(o.getGameObject(), environment);
-        
         modelBatch.end();
         
         camera.update();

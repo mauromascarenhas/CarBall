@@ -5,6 +5,7 @@ import br.edu.ufabc.ipj.spaceshooter.model.Pedestal;
 import br.edu.ufabc.ipj.spaceshooter.model.SciFiCargoSarship;
 import br.edu.ufabc.ipj.spaceshooter.model.SciFiCosair;
 import br.edu.ufabc.ipj.spaceshooter.model.SciFiFighter;
+import br.edu.ufabc.ipj.spaceshooter.model.SciFiIntergalactic;
 import br.edu.ufabc.ipj.spaceshooter.utils.Commands;
 import br.edu.ufabc.ipj.spaceshooter.utils.ModelSelector;
 import com.badlogic.gdx.graphics.g3d.Material;
@@ -31,6 +32,7 @@ public class SpaceShipSelectionAction {
         objects.add(new SciFiFighter());
         objects.add(new SciFiCosair(false));
         objects.add(new SciFiCargoSarship(false));
+        objects.add(new SciFiIntergalactic(false));
         
         for (AbstractModel obj: objects){
             for (Material mat : obj.getGameObject().materials)
@@ -57,6 +59,8 @@ public class SpaceShipSelectionAction {
                 ((SciFiCosair) o).rotateSelection(delta);
             else if (o instanceof SciFiCargoSarship)
                 ((SciFiCargoSarship) o).rotateSelection(delta);
+            else if (o instanceof SciFiIntergalactic)
+                ((SciFiIntergalactic) o).rotateSelection(delta);
     }
     
     private void swapSpaceship(Commands.Command command){
