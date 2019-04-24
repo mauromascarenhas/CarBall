@@ -36,6 +36,8 @@ public class GameObject extends ModelInstance{
     public GameObject(Model model){
         super(model);
         
+        angle = 0;
+        
         visible = true;
         animationFinished = false;
         boundingBox = new BoundingBox();

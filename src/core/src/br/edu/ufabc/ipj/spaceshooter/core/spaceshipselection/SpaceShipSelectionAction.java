@@ -1,6 +1,5 @@
 package br.edu.ufabc.ipj.spaceshooter.core.spaceshipselection;
 
-import br.edu.ufabc.ipj.spaceshooter.SpaceShooterGame;
 import br.edu.ufabc.ipj.spaceshooter.model.AbstractModel;
 import br.edu.ufabc.ipj.spaceshooter.model.Pedestal;
 import br.edu.ufabc.ipj.spaceshooter.model.SciFiCargoSarship;

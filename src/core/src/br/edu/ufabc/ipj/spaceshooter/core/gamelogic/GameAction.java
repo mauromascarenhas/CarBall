@@ -114,19 +114,20 @@ public class GameAction {
         }
         
         Vector3 cPos = new Vector3();
-        if (objects.size > 1){
-            objects.get(1).getGameObject().transform.translate(0, 0, asteroidSpeed / asteroidScale);
-            objects.get(1).getGameObject().transform.getTranslation(cPos);
+        for (int i = objects.size - 1; i > 0; --i){
+            GameObject current = objects.get(i).getGameObject();
+            current.transform.translate(0, 0, asteroidSpeed / asteroidScale);
+            current.transform.getTranslation(cPos);
             
-            System.out.println(cPos);
-            if (cPos.z > 26.0f){
-                objects.removeIndex(1);
+            if (cPos.z > 26.0){
+                objects.removeIndex(i);
                 
-                objects.add(new Asteroid());
-                for (Material mat : objects.get(objects.size - 1).getGameObject().materials)
+                Asteroid newAsteroid = new Asteroid();
+                for (Material mat : newAsteroid.getGameObject().materials)
                     mat.remove(ColorAttribute.Emissive);
-                objects.get(objects.size - 1).getGameObject().transform.translate((float)(Math.random() * 61.0 - 30.0) / asteroidScale,
-                                                                                    0, -300.0f / asteroidScale);
+                newAsteroid.getGameObject().transform.translate((float)(Math.random() * 61.0 - 30.0) / asteroidScale,
+                                                                   0, -300.0f / asteroidScale);
+                objects.add(newAsteroid);
             }
         }
 

@@ -47,6 +47,11 @@ public class Asteroid extends AbstractModel{
         object.setAngle(30 * delta);
     }
     
+    public void rotateSelection(float angle, float delta){
+        object.transform.rotate(Vector3.Y, angle * delta);
+        object.setAngle(angle * delta);
+    }
+    
     public static float getDefaultSpeed(){
         return 1;
     }
