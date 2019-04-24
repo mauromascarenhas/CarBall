@@ -29,3 +29,4 @@ hs_err_pid*
 # Do not ignore
 !/badlogic_tools/*
 !/base_assets/*
+!/base_game/*
