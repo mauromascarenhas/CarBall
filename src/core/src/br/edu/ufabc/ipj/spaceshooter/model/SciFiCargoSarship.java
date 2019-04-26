@@ -10,6 +10,9 @@ import com.badlogic.gdx.math.Vector3;
 public class SciFiCargoSarship extends AbstractModel{
         
     public static final float DEFAULT_SCALE = 0.045f;
+    public static final float SHOT_RELOAD_TIME = 0.5f;
+    
+    public static boolean USES_MISSILE = false;
     
     private GameObject object;
     

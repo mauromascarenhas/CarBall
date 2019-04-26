@@ -8,6 +8,7 @@ import com.badlogic.gdx.graphics.g3d.utils.ModelBuilder;
 import br.edu.ufabc.ipj.spaceshooter.screen.BaseScreen;
 import br.edu.ufabc.ipj.spaceshooter.screen.GameScreen;
 import br.edu.ufabc.ipj.spaceshooter.screen.LoadingScreen;
+import br.edu.ufabc.ipj.spaceshooter.screen.MenuScreen;
 import br.edu.ufabc.ipj.spaceshooter.screen.SpaceshipSelectionScreen;
 import br.edu.ufabc.ipj.spaceshooter.utils.Commands;
 import com.badlogic.gdx.Input;
@@ -30,7 +31,8 @@ public class SpaceShooterGame extends Game implements InputProcessor {
         
         assetManager.load("three_dimensional/asteroid/Asteroid.g3db", Model.class);
         
-        assetManager.load("three_dimensional/agm_missile/Missile_AGM-65.g3db", Model.class);
+        assetManager.load("three_dimensional/shot/shot.g3db", Model.class);
+        assetManager.load("three_dimensional/missile/missile.g3db", Model.class);
         
         assetManager.load("three_dimensional/scifi_cosair/cosair.g3db", Model.class);
         assetManager.load("three_dimensional/scifi_spacecraft/SciFi_Fighter.g3db", Model.class);
@@ -50,9 +52,10 @@ public class SpaceShooterGame extends Game implements InputProcessor {
         
         String currentId = currentScreen.getId();
         if (currentScreen.isDone())
-            if(currentId.equals("loading")) currentScreen = new SpaceshipSelectionScreen("selection");
+            if(currentId.equals("loading")) currentScreen = new MenuScreen("menu");
+            else if (currentId.equals("menu")) currentScreen = new SpaceshipSelectionScreen("selection");
             else if (currentId.equals("selection")) currentScreen = new GameScreen("game", ((SpaceshipSelectionScreen)currentScreen).getSelected());
-            else if (currentId.equals("game")) currentScreen = new SpaceshipSelectionScreen("selection");
+            else if (currentId.equals("game")) currentScreen = new MenuScreen("menu");
     }
 
     @Override

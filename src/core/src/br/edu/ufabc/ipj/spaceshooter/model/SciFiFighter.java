@@ -10,6 +10,9 @@ import com.badlogic.gdx.math.Vector3;
 public class SciFiFighter extends AbstractModel{
     
     public static float DEFAULT_SCALE = 1;
+    public static float SHOT_RELOAD_TIME = 1.5f;
+    
+    public static boolean USES_MISSILE = true;
     
     private GameObject object;
     
@@ -46,6 +49,6 @@ public class SciFiFighter extends AbstractModel{
     }
     
     public static float getDefaultSpeed(){
-        return 10.0f;
+        return 9.0f;
     }
 }

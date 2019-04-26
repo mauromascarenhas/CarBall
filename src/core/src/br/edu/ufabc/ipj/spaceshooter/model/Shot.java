@@ -7,28 +7,23 @@ import com.badlogic.gdx.graphics.g3d.Model;
 import com.badlogic.gdx.graphics.g3d.attributes.ColorAttribute;
 import com.badlogic.gdx.math.Vector3;
 
-public class SciFiCosair extends AbstractModel{
-        
-    public static final float DEFAULT_SCALE = 0.007f;
-    public static final float SHOT_RELOAD_TIME = 1.5f;
+public class Shot extends AbstractModel{
     
-    public static boolean USES_MISSILE = false;
+    public static float DEFAULT_SCALE = 1.0f;
     
     private GameObject object;
     
-    public SciFiCosair(){
+    public Shot(){
         this(true);
     }
     
-    public SciFiCosair(boolean visible){
+    public Shot(boolean visible){
         super(true, true);
         
-        Model mIdle = SpaceShooterGame.assetManager.get("three_dimensional/scifi_cosair/cosair.g3db");
+        Model mIdle = SpaceShooterGame.assetManager.get("three_dimensional/shot/shot.g3db");
         object = new GameObject(mIdle, visible);
-        
-        object.updateBoxScale(DEFAULT_SCALE);
         object.transform.scale(DEFAULT_SCALE, DEFAULT_SCALE, DEFAULT_SCALE);
-        object.transform.rotate(Vector3.Y, 180);
+        object.updateBoxScale(DEFAULT_SCALE);
         
         for (Material m : object.materials)
             m.remove(ColorAttribute.Emissive);
@@ -53,6 +48,6 @@ public class SciFiCosair extends AbstractModel{
     }
     
     public static float getDefaultSpeed(){
-        return - 15.0f;
+        return 1.0f;
     }
 }

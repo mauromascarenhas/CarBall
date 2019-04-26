@@ -8,6 +8,7 @@ import br.edu.ufabc.ipj.spaceshooter.model.SciFiCargoSarship;
 import br.edu.ufabc.ipj.spaceshooter.model.SciFiCosair;
 import br.edu.ufabc.ipj.spaceshooter.model.SciFiFighter;
 import br.edu.ufabc.ipj.spaceshooter.model.SciFiIntergalactic;
+import br.edu.ufabc.ipj.spaceshooter.model.Shot;
 import br.edu.ufabc.ipj.spaceshooter.utils.Commands;
 import br.edu.ufabc.ipj.spaceshooter.utils.ModelSelector;
 import com.badlogic.gdx.graphics.g3d.Material;
@@ -20,19 +21,19 @@ public class GameAction {
     // Set done on destroy
     public boolean isDone;
     
-    // Max shots
-    private final int maxShots = 1;
+    // Sets if the game is paused
+    public boolean isPaused;
     
     // Objects scale
-    private final float shotScale;
-    private final float asteroidScale;
-    private final float spacecraftScale;
+    private final float SHOT_SCALE;
+    private final float ASTEROID_SCALE;
+    private final float SPACECRAFT_SCALE;
     
     // Objects speed
-    private final float shotSpeed;
-    private final float shotReload = 2.5f;
-    private final float asteroidSpeed;
-    private final float spacecraftSpeed;
+    private final float SHOT_SPEED;
+    private final float SHOT_RELOAD;
+    private final float ASTEROID_SPEED;
+    private final float SPACECRAFT_SPEED;
     
     // Game logic variables
     public int lives;
@@ -41,11 +42,14 @@ public class GameAction {
     public long score;
     
     private float shotTimer;
+    private float asteroidTimer;
     private float invulnerabilityTimer;
     
+    // Sets it spacecraft uses missiles instead
     private boolean isInvulnerable;
+    private final boolean IS_MISSILE;
     
-    protected Array<Missile> missiles;            
+    protected Array<AbstractModel> shots;            
     protected Array<AbstractModel> objects;
     
     public GameAction(ModelSelector selected){
@@ -55,51 +59,63 @@ public class GameAction {
         this.lives = 3;
         
         this.shotTimer = 0;
+        this.asteroidTimer = 0;
         this.invulnerabilityCount = 0;
-        this.invulnerabilityTimer = 0;
+        this.invulnerabilityTimer = 0;      
         
+        this.isPaused = false;
         this.isInvulnerable = false;
         
+        shots = new Array<AbstractModel>();
         objects = new Array<AbstractModel>();
-        missiles = new Array<Missile>();
         
         //Load models in here
         switch(selected){
             case SCIFI_COSAIR:
                 objects.add(new SciFiCosair());
                 objects.first().getGameObject().transform.rotate(Vector3.Y, 180);
-                spacecraftSpeed = SciFiCosair.getDefaultSpeed();
-                spacecraftScale = SciFiCosair.DEFAULT_SCALE;
+                SPACECRAFT_SPEED = SciFiCosair.getDefaultSpeed();
+                SPACECRAFT_SCALE = SciFiCosair.DEFAULT_SCALE;
+                SHOT_RELOAD = SciFiCosair.SHOT_RELOAD_TIME;
+                IS_MISSILE = SciFiCosair.USES_MISSILE;
                 break;
             case SCIFI_FIGHTER:
                 objects.add(new SciFiFighter());
                 objects.first().getGameObject().transform.rotate(Vector3.Y, 180);
-                spacecraftSpeed = SciFiFighter.getDefaultSpeed();
-                spacecraftScale = SciFiFighter.DEFAULT_SCALE;
+                SPACECRAFT_SPEED = SciFiFighter.getDefaultSpeed();
+                SPACECRAFT_SCALE = SciFiFighter.DEFAULT_SCALE;
+                SHOT_RELOAD = SciFiFighter.SHOT_RELOAD_TIME;
+                IS_MISSILE = SciFiFighter.USES_MISSILE;
                 break;
             case SCIFI_STARSHIP:
                 objects.add(new SciFiCargoSarship());
                 objects.first().getGameObject().transform.rotate(Vector3.Y, 180);
-                spacecraftSpeed = SciFiCargoSarship.getDefaultSpeed();
-                spacecraftScale = SciFiCargoSarship.DEFAULT_SCALE;
+                SPACECRAFT_SPEED = SciFiCargoSarship.getDefaultSpeed();
+                SPACECRAFT_SCALE = SciFiCargoSarship.DEFAULT_SCALE;
+                SHOT_RELOAD = SciFiCargoSarship.SHOT_RELOAD_TIME;
+                IS_MISSILE = SciFiCargoSarship.USES_MISSILE;
                 break;
             case SCIFI_INTERGALACTIC:
                 objects.add(new SciFiIntergalactic());
                 objects.first().getGameObject().transform.rotate(Vector3.Y, 180);
-                spacecraftSpeed = SciFiIntergalactic.getDefaultSpeed();
-                spacecraftScale = SciFiIntergalactic.DEFAULT_SCALE;
+                SPACECRAFT_SPEED = SciFiIntergalactic.getDefaultSpeed();
+                SPACECRAFT_SCALE = SciFiIntergalactic.DEFAULT_SCALE;
+                SHOT_RELOAD = SciFiIntergalactic.SHOT_RELOAD_TIME;
+                IS_MISSILE = SciFiIntergalactic.USES_MISSILE;
                 break;
             default:
-                spacecraftSpeed = 8;
-                spacecraftScale = 1;
+                IS_MISSILE = false;
+                SHOT_RELOAD = 1.5F;
+                SPACECRAFT_SPEED = 8;
+                SPACECRAFT_SCALE = 1;
         }
         
         shotTimer = 10.1f;
-        shotScale = Missile.DEFAULT_SCALE;
-        shotSpeed = Missile.getDefaultSpeed();
+        SHOT_SPEED = Missile.getDefaultSpeed();
+        SHOT_SCALE = IS_MISSILE ? Missile.DEFAULT_SCALE : Shot.DEFAULT_SCALE;
         
-        asteroidScale = Asteroid.DEFAULT_SCALE;
-        asteroidSpeed = Asteroid.getDefaultSpeed();
+        ASTEROID_SCALE = Asteroid.DEFAULT_SCALE;
+        ASTEROID_SPEED = Asteroid.getDefaultSpeed();
         
         objects.add(new Asteroid());
         
@@ -107,14 +123,17 @@ public class GameAction {
             for (Material mat : obj.getGameObject().materials)
                 mat.remove(ColorAttribute.Emissive);
         
-        objects.get(1).getGameObject().transform.translate(0, 0, -300.0f / asteroidScale);
+        objects.get(1).getGameObject().transform.translate(0, 0, -300.0f / ASTEROID_SCALE);
     }
     
     public void update(float delta){
         for (AbstractModel o : objects)
             o.update(delta);
+        for (AbstractModel o : shots)
+            o.update(delta);
         
         shotTimer += delta;
+        asteroidTimer += delta;
         if (lives > 0) score += delta * 100;
         
         if (this.isInvulnerable){
@@ -135,18 +154,12 @@ public class GameAction {
         Vector3 cPos = new Vector3();
         for (int i = objects.size - 1; i > 0; --i){
             GameObject current = objects.get(i).getGameObject();
-            current.transform.translate(0, 0, asteroidSpeed / asteroidScale);
+            current.transform.translate(0, 0, ASTEROID_SPEED / ASTEROID_SCALE);
             current.transform.getTranslation(cPos);
             
             if (cPos.z > 26.0){
                 objects.removeIndex(i);
-                
-                Asteroid newAsteroid = new Asteroid();
-                for (Material mat : newAsteroid.getGameObject().materials)
-                    mat.remove(ColorAttribute.Emissive);
-                newAsteroid.getGameObject().transform.translate((float)(Math.random() * 61.0 - 30.0) / asteroidScale,
-                                                                   0, -300.0f / asteroidScale);
-                objects.add(newAsteroid);
+                continue;
             }
             
             if (!this.isInvulnerable && this.lives > 0){
@@ -163,37 +176,48 @@ public class GameAction {
                     }
             }
             
-            for (int k = missiles.size - 1; k > -1; --k)
-                if (missiles.get(k).collidesWith(objects.get(i))){
-                    missiles.removeIndex(k);
+            for (int k = shots.size - 1; k > -1; --k)
+                if (shots.get(k).collidesWith(objects.get(i))){
                     objects.removeIndex(i);
+                    shots.removeIndex(k);
+                    score += 100;
                     break;
                 }
         }
         
-        for (int i = missiles.size - 1; i > -1; --i){
-            GameObject current = missiles.get(i).getGameObject();
-            current.transform.translate(- shotSpeed / shotScale, 0, 0);
+        if (asteroidTimer >= 4){
+            Asteroid newAsteroid = new Asteroid();
+            for (Material mat : newAsteroid.getGameObject().materials)
+                mat.remove(ColorAttribute.Emissive);
+            newAsteroid.getGameObject().transform.translate((float)(Math.random() * 61.0 - 30.0) / ASTEROID_SCALE,
+                                                                0, -300.0f / ASTEROID_SCALE);
+            objects.add(newAsteroid);
+            asteroidTimer = 0;
+        }
+        
+        for (int i = shots.size - 1; i > -1; --i){
+            GameObject current = shots.get(i).getGameObject();
+            current.transform.translate(0, 0, - SHOT_SPEED / SHOT_SCALE);
             current.transform.getTranslation(cPos);
             
-            if (cPos.z < -300) missiles.removeIndex(i);
+            if (cPos.z < -300) shots.removeIndex(i);
         }
 
         objects.first().getGameObject().transform.getTranslation(cPos);
         if (Commands.hasCommand(Commands.Command.LEFT) && cPos.x > -25) 
-            objects.first().getGameObject().transform.translate(spacecraftSpeed * delta / spacecraftScale, 0, 0);
+            objects.first().getGameObject().transform.translate(SPACECRAFT_SPEED * delta / SPACECRAFT_SCALE, 0, 0);
         else if (Commands.hasCommand(Commands.Command.RIGHT) && cPos.x < 25) 
-            objects.first().getGameObject().transform.translate(-spacecraftSpeed * delta / spacecraftScale, 0, 0);
+            objects.first().getGameObject().transform.translate(-SPACECRAFT_SPEED * delta / SPACECRAFT_SCALE, 0, 0);
         
-        if (Commands.hasCommand(Commands.Command.SHOT) && shotTimer > shotReload){
+        if (Commands.hasCommand(Commands.Command.SHOT) && shotTimer > SHOT_RELOAD){
             Vector3 spaceCraftPos = new Vector3();
             objects.first().getGameObject().transform.getTranslation(spaceCraftPos);
             
-            Missile newMissile = new Missile();
-            for (Material mat : newMissile.getGameObject().materials)
+            AbstractModel newShot = IS_MISSILE ? new Missile() : new Shot();
+            for (Material mat : newShot.getGameObject().materials)
                     mat.remove(ColorAttribute.Emissive);
-            newMissile.getGameObject().transform.translate(0, 0, - spaceCraftPos.x / shotScale);
-            missiles.add(newMissile);
+            newShot.getGameObject().transform.translate(spaceCraftPos.x / SHOT_SCALE, 0, 0);
+            shots.add(newShot);
             shotTimer = 0;
         }
         

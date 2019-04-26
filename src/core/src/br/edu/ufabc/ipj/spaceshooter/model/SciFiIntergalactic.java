@@ -10,6 +10,9 @@ import com.badlogic.gdx.math.Vector3;
 public class SciFiIntergalactic extends AbstractModel{
     
     public static float DEFAULT_SCALE = 0.025f;
+    public static float SHOT_RELOAD_TIME = 2;
+    
+    public static boolean USES_MISSILE = true;
     
     private GameObject object;
     
@@ -48,6 +51,6 @@ public class SciFiIntergalactic extends AbstractModel{
     }
     
     public static float getDefaultSpeed(){
-        return 11.0f;
+        return 13.0f;
     }
 }

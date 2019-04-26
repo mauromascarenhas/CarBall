@@ -9,7 +9,7 @@ import com.badlogic.gdx.math.Vector3;
 
 public class Missile extends AbstractModel{
     
-    public static float DEFAULT_SCALE = 0.5f;
+    public static float DEFAULT_SCALE = 0.06f;
     
     private GameObject object;
     
@@ -20,9 +20,8 @@ public class Missile extends AbstractModel{
     public Missile(boolean visible){
         super(true, true);
         
-        Model mIdle = SpaceShooterGame.assetManager.get("three_dimensional/agm_missile/Missile_AGM-65.g3db");
+        Model mIdle = SpaceShooterGame.assetManager.get("three_dimensional/missile/missile.g3db");
         object = new GameObject(mIdle, visible);
-        object.transform.rotate(Vector3.Y, 270);
         object.transform.scale(DEFAULT_SCALE, DEFAULT_SCALE, DEFAULT_SCALE);
         object.updateBoxScale(DEFAULT_SCALE);
         
@@ -49,6 +48,6 @@ public class Missile extends AbstractModel{
     }
     
     public static float getDefaultSpeed(){
-        return 10.0f;
+        return 5.0f;
     }
 }
