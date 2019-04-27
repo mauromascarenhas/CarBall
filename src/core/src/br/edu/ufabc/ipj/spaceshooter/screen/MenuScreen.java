@@ -98,8 +98,6 @@ public class MenuScreen extends BaseScreen {
                 }
             }
         }
-        
-        System.out.println("Position -> X : " + xCoord + " ; Y : " + yCoord);
     }
 
     @Override

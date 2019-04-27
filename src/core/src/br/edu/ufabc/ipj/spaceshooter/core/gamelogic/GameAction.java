@@ -21,6 +21,7 @@ public class GameAction {
     
     // Set done on destroy
     public boolean isDone;
+    public boolean canProceed;
     
     public boolean canShot;
     
@@ -48,6 +49,7 @@ public class GameAction {
     
     public long score;
     
+    private float lostTimer;
     private float shotTimer;
     private float asteroidTimer;
     private float invulnerabilityTimer;
@@ -66,6 +68,7 @@ public class GameAction {
         this.score = 0;
         this.lives = 3;
         
+        this.lostTimer = 0;
         this.shotTimer = 0;
         this.asteroidTimer = 0;
         this.invulnerabilityCount = 0;
@@ -170,6 +173,9 @@ public class GameAction {
         shotTimer += delta;
         asteroidTimer += delta;
         if (lives > 0) score += (delta * 100 * DIFFICULTY.getValue());
+        else lostTimer += delta;
+        
+        if (lostTimer >= 4) this.canProceed = true;
         
         this.canShot = shotTimer > SHOT_RELOAD;
         
@@ -265,6 +271,6 @@ public class GameAction {
             shotTimer = 0;
         }
         
-        if (this.lives == 0 && Commands.hasCommand(Commands.Command.SHOT)) this.isDone = true;
+        if (this.canProceed && Commands.hasCommand(Commands.Command.SHOT)) this.isDone = true;
     }
 }

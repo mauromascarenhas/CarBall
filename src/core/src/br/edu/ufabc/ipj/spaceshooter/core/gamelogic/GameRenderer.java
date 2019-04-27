@@ -16,12 +16,15 @@ import com.badlogic.gdx.graphics.g3d.environment.DirectionalLight;
 import com.badlogic.gdx.math.Matrix4;
 
 public class GameRenderer {
+    private float overlay_alpha;
+    
     private final GameAction gameAction;
     private final ModelBatch modelBatch;
     private final Environment environment;
     private final PerspectiveCamera camera;
     
     // Static content
+    private Sprite black_sprite;
     private final Texture texture;
     private final Texture life_symb;
     private final Texture shot_symb;
@@ -34,13 +37,15 @@ public class GameRenderer {
     public GameRenderer(GameAction action){
         this.gameAction = action;
         
+        overlay_alpha = 0;
+        
         //Loads static content
         texture = new Texture("static_images/space_background_dark_2.jpg");
         shot_symb = new Texture("static_images/target_icon.png");
         black_ovl = new Texture("static_images/black_overlay.jpg");
         life_symb = new Texture("static_images/spacecraft_icon.png");
         
-        bitmapFont = new BitmapFont(Gdx.files.internal("fonts/space_age.fnt"));
+        bitmapFont = new BitmapFont(Gdx.files.internal("fonts/space_age/big/space_age.fnt"));
         
         viewMatrix = new Matrix4();
         transMatrix = new Matrix4();
@@ -72,14 +77,15 @@ public class GameRenderer {
         spriteBatch.draw(texture, 0, 0, Utilities.GAME_WIDTH, Utilities.GAME_HEIGHT, 0, 0,
                             2048, 1152, false, false);
         
-        if (gameAction.canShot)
+        if (gameAction.canShot && gameAction.lives > 0)
             spriteBatch.draw(shot_symb, 1250, 40, 60.0f, 60.0f, 0, 0, 512, 512, false, false);
         
         for (int i = 0; i < gameAction.lives; ++i)
             spriteBatch.draw(life_symb, (40 + i * 52f), 40, 50.0f, 50.0f, 0, 0, 512, 512, false, false);
             
-        bitmapFont.getData().setScale(2.0f);
-        bitmapFont.draw(spriteBatch, String.format("SCORE : %d", gameAction.score), 50.0f, 650.0f);
+        bitmapFont.getData().setScale(1);
+        if (gameAction.lives > 0)
+            bitmapFont.draw(spriteBatch, String.format("SCORE : %d", gameAction.score), 50.0f, 650.0f);
         spriteBatch.end();
         
         modelBatch.begin(camera);
@@ -90,13 +96,19 @@ public class GameRenderer {
         modelBatch.end();
         
         if (gameAction.lives < 1){
+            if (overlay_alpha < 0.7f) overlay_alpha += (0.2f * delta);
+            
             spriteBatch.begin();
             spriteBatch.enableBlending();
-            Sprite s = new Sprite(black_ovl, Utilities.GAME_WIDTH, Utilities.GAME_HEIGHT);
-            s.setColor(0, 0, 0, 0.7f);
-            s.draw(spriteBatch);
-            /*spriteBatch.draw(black_ovl, 0, 0, Utilities.GAME_WIDTH, Utilities.GAME_HEIGHT, 0, 0,
-                            800, 500, false, false);*/
+            
+            black_sprite = new Sprite(black_ovl, Utilities.GAME_WIDTH - 100, Utilities.GAME_HEIGHT - 80);
+            black_sprite.setColor(0, 0, 0, overlay_alpha);
+            black_sprite.setPosition(50, 40);
+            black_sprite.draw(spriteBatch);
+            
+            if (gameAction.canProceed)
+                bitmapFont.draw(spriteBatch, "<- SHOT TO CONTINUE ->", 200, 100);
+            
             spriteBatch.end();
         }
         
