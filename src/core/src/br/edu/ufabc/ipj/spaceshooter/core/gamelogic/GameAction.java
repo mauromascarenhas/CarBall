@@ -10,6 +10,7 @@ import br.edu.ufabc.ipj.spaceshooter.model.SciFiFighter;
 import br.edu.ufabc.ipj.spaceshooter.model.SciFiIntergalactic;
 import br.edu.ufabc.ipj.spaceshooter.model.Shot;
 import br.edu.ufabc.ipj.spaceshooter.utils.Commands;
+import br.edu.ufabc.ipj.spaceshooter.utils.DifficultySelector;
 import br.edu.ufabc.ipj.spaceshooter.utils.ModelSelector;
 import com.badlogic.gdx.graphics.g3d.Material;
 import com.badlogic.gdx.graphics.g3d.attributes.ColorAttribute;
@@ -21,12 +22,18 @@ public class GameAction {
     // Set done on destroy
     public boolean isDone;
     
+    public boolean canShot;
+    
     // Sets if the game is paused
     public boolean isPaused;
+    
+    // Sets game difficulty
+    private final DifficultySelector DIFFICULTY;
     
     // Objects scale
     private final float SHOT_SCALE;
     private final float ASTEROID_SCALE;
+    private final float ASTEROID_TSPAWN;
     private final float SPACECRAFT_SCALE;
     
     // Objects speed
@@ -52,7 +59,8 @@ public class GameAction {
     protected Array<AbstractModel> shots;            
     protected Array<AbstractModel> objects;
     
-    public GameAction(ModelSelector selected){
+    public GameAction(ModelSelector selected,
+                        DifficultySelector difficulty){
         this.isDone = false;
         
         this.score = 0;
@@ -63,59 +71,86 @@ public class GameAction {
         this.invulnerabilityCount = 0;
         this.invulnerabilityTimer = 0;      
         
+        this.canShot = true;
         this.isPaused = false;
         this.isInvulnerable = false;
         
         shots = new Array<AbstractModel>();
         objects = new Array<AbstractModel>();
         
+        float shotReloadTmp, spacecraftSpeedTmp,
+                asteroidSpeedTmp = Asteroid.getDefaultSpeed();
+        
         //Load models in here
         switch(selected){
             case SCIFI_COSAIR:
                 objects.add(new SciFiCosair());
                 objects.first().getGameObject().transform.rotate(Vector3.Y, 180);
-                SPACECRAFT_SPEED = SciFiCosair.getDefaultSpeed();
+                spacecraftSpeedTmp = SciFiCosair.getDefaultSpeed();
                 SPACECRAFT_SCALE = SciFiCosair.DEFAULT_SCALE;
-                SHOT_RELOAD = SciFiCosair.SHOT_RELOAD_TIME;
+                shotReloadTmp = SciFiCosair.SHOT_RELOAD_TIME;
                 IS_MISSILE = SciFiCosair.USES_MISSILE;
                 break;
             case SCIFI_FIGHTER:
                 objects.add(new SciFiFighter());
                 objects.first().getGameObject().transform.rotate(Vector3.Y, 180);
-                SPACECRAFT_SPEED = SciFiFighter.getDefaultSpeed();
+                spacecraftSpeedTmp = SciFiFighter.getDefaultSpeed();
                 SPACECRAFT_SCALE = SciFiFighter.DEFAULT_SCALE;
-                SHOT_RELOAD = SciFiFighter.SHOT_RELOAD_TIME;
+                shotReloadTmp = SciFiFighter.SHOT_RELOAD_TIME;
                 IS_MISSILE = SciFiFighter.USES_MISSILE;
                 break;
             case SCIFI_STARSHIP:
                 objects.add(new SciFiCargoSarship());
                 objects.first().getGameObject().transform.rotate(Vector3.Y, 180);
-                SPACECRAFT_SPEED = SciFiCargoSarship.getDefaultSpeed();
+                spacecraftSpeedTmp = SciFiCargoSarship.getDefaultSpeed();
                 SPACECRAFT_SCALE = SciFiCargoSarship.DEFAULT_SCALE;
-                SHOT_RELOAD = SciFiCargoSarship.SHOT_RELOAD_TIME;
+                shotReloadTmp = SciFiCargoSarship.SHOT_RELOAD_TIME;
                 IS_MISSILE = SciFiCargoSarship.USES_MISSILE;
                 break;
             case SCIFI_INTERGALACTIC:
                 objects.add(new SciFiIntergalactic());
                 objects.first().getGameObject().transform.rotate(Vector3.Y, 180);
-                SPACECRAFT_SPEED = SciFiIntergalactic.getDefaultSpeed();
+                spacecraftSpeedTmp = SciFiIntergalactic.getDefaultSpeed();
                 SPACECRAFT_SCALE = SciFiIntergalactic.DEFAULT_SCALE;
-                SHOT_RELOAD = SciFiIntergalactic.SHOT_RELOAD_TIME;
+                shotReloadTmp = SciFiIntergalactic.SHOT_RELOAD_TIME;
                 IS_MISSILE = SciFiIntergalactic.USES_MISSILE;
                 break;
             default:
-                IS_MISSILE = false;
-                SHOT_RELOAD = 1.5F;
-                SPACECRAFT_SPEED = 8;
+                shotReloadTmp = 1.5F;
+                spacecraftSpeedTmp = 8;
                 SPACECRAFT_SCALE = 1;
+                IS_MISSILE = false;
         }
+        
+        switch(difficulty){
+            case HARD:
+                ASTEROID_TSPAWN = 0.75f;
+                spacecraftSpeedTmp *= 5.0f;
+                asteroidSpeedTmp *= 4.0f;
+                shotReloadTmp *= 3.0f;
+                break;
+            case MEDIUM:
+                ASTEROID_TSPAWN = 2.0f;
+                spacecraftSpeedTmp *= 3.0f;
+                asteroidSpeedTmp *= 2.0f;
+                shotReloadTmp *= 1.5f;
+                break;
+            case EASY:
+            default:
+                ASTEROID_TSPAWN = 4.0f;
+        }
+        
+        DIFFICULTY = difficulty;
+        
+        SHOT_RELOAD = shotReloadTmp;
+        SPACECRAFT_SPEED = spacecraftSpeedTmp;
         
         shotTimer = 10.1f;
         SHOT_SPEED = Missile.getDefaultSpeed();
         SHOT_SCALE = IS_MISSILE ? Missile.DEFAULT_SCALE : Shot.DEFAULT_SCALE;
         
+        ASTEROID_SPEED = asteroidSpeedTmp;
         ASTEROID_SCALE = Asteroid.DEFAULT_SCALE;
-        ASTEROID_SPEED = Asteroid.getDefaultSpeed();
         
         objects.add(new Asteroid());
         
@@ -134,11 +169,13 @@ public class GameAction {
         
         shotTimer += delta;
         asteroidTimer += delta;
-        if (lives > 0) score += delta * 100;
+        if (lives > 0) score += (delta * 100 * DIFFICULTY.getValue());
+        
+        this.canShot = shotTimer > SHOT_RELOAD;
         
         if (this.isInvulnerable){
             this.invulnerabilityTimer += delta;
-            if (this.invulnerabilityTimer >= 0.5f){
+            if (this.invulnerabilityTimer >= 0.25f){
                 this.invulnerabilityTimer = 0;
                 
                 GameObject spaceCraft = objects.first().getGameObject();
@@ -147,7 +184,7 @@ public class GameAction {
                 this.invulnerabilityCount++;
             }
             
-            this.isInvulnerable = this.invulnerabilityCount != 5;
+            this.isInvulnerable = this.invulnerabilityCount != 11;
             if (!this.isInvulnerable) this.invulnerabilityCount = 0;
         }
         
@@ -180,18 +217,25 @@ public class GameAction {
                 if (shots.get(k).collidesWith(objects.get(i))){
                     objects.removeIndex(i);
                     shots.removeIndex(k);
-                    score += 100;
+                    score += (100 * DIFFICULTY.getValue());
                     break;
                 }
         }
         
-        if (asteroidTimer >= 4){
-            Asteroid newAsteroid = new Asteroid();
-            for (Material mat : newAsteroid.getGameObject().materials)
-                mat.remove(ColorAttribute.Emissive);
-            newAsteroid.getGameObject().transform.translate((float)(Math.random() * 61.0 - 30.0) / ASTEROID_SCALE,
-                                                                0, -300.0f / ASTEROID_SCALE);
-            objects.add(newAsteroid);
+        if (asteroidTimer >= ASTEROID_TSPAWN){
+            float sortedPos = (float)(Math.random() * 61.0 - 30.0) / ASTEROID_SCALE;
+            
+            for (int i = 0; i < DIFFICULTY.getValue(); ++i){
+                if (Math.random() < 0.5 && i != 0) continue;
+                
+                Asteroid newAsteroid = new Asteroid();
+                for (Material mat : newAsteroid.getGameObject().materials)
+                    mat.remove(ColorAttribute.Emissive);
+                newAsteroid.getGameObject().transform.translate(sortedPos += (15 / ASTEROID_SCALE), 0,
+                                                                -300.0f / ASTEROID_SCALE);
+                objects.add(newAsteroid);
+            }
+            
             asteroidTimer = 0;
         }
         
@@ -209,7 +253,7 @@ public class GameAction {
         else if (Commands.hasCommand(Commands.Command.RIGHT) && cPos.x < 25) 
             objects.first().getGameObject().transform.translate(-SPACECRAFT_SPEED * delta / SPACECRAFT_SCALE, 0, 0);
         
-        if (Commands.hasCommand(Commands.Command.SHOT) && shotTimer > SHOT_RELOAD){
+        if (Commands.hasCommand(Commands.Command.SHOT) && canShot){
             Vector3 spaceCraftPos = new Vector3();
             objects.first().getGameObject().transform.getTranslation(spaceCraftPos);
             

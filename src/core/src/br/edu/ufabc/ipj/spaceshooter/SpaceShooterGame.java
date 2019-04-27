@@ -11,6 +11,7 @@ import br.edu.ufabc.ipj.spaceshooter.screen.LoadingScreen;
 import br.edu.ufabc.ipj.spaceshooter.screen.MenuScreen;
 import br.edu.ufabc.ipj.spaceshooter.screen.SpaceshipSelectionScreen;
 import br.edu.ufabc.ipj.spaceshooter.utils.Commands;
+import br.edu.ufabc.ipj.spaceshooter.utils.DifficultySelector;
 import com.badlogic.gdx.Input;
 import com.badlogic.gdx.graphics.g3d.Model;
 
@@ -18,12 +19,16 @@ import com.badlogic.gdx.graphics.g3d.Model;
 public class SpaceShooterGame extends Game implements InputProcessor {
     
     private BaseScreen currentScreen;
+    private DifficultySelector selectedDifficulty;
+    
     public static AssetManager assetManager;
     public static ModelBuilder modelBuider;
     public static boolean DEBUG = false;
 
     @Override
     public void create() {
+        selectedDifficulty = DifficultySelector.EASY;
+        
         modelBuider = new ModelBuilder();
         assetManager = new AssetManager();
         
@@ -52,9 +57,13 @@ public class SpaceShooterGame extends Game implements InputProcessor {
         
         String currentId = currentScreen.getId();
         if (currentScreen.isDone())
-            if(currentId.equals("loading")) currentScreen = new MenuScreen("menu");
-            else if (currentId.equals("menu")) currentScreen = new SpaceshipSelectionScreen("selection");
-            else if (currentId.equals("selection")) currentScreen = new GameScreen("game", ((SpaceshipSelectionScreen)currentScreen).getSelected());
+            if(currentId.equals("loading")) currentScreen = new MenuScreen("menu", selectedDifficulty);
+            else if (currentId.equals("menu")){
+                selectedDifficulty = ((MenuScreen)currentScreen).selectedDifficulty;
+                currentScreen = new SpaceshipSelectionScreen("selection");
+            }
+            else if (currentId.equals("selection")) currentScreen = new GameScreen("game", ((SpaceshipSelectionScreen)currentScreen).getSelected(),
+                                                                                    selectedDifficulty);
             else if (currentId.equals("game")) currentScreen = new MenuScreen("menu");
     }
 

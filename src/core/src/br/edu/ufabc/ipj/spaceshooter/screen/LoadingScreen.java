@@ -18,11 +18,12 @@ public class LoadingScreen extends BaseScreen{
     
     private final String gameTitle;
     
-    private Texture texture;
-    private Matrix4 viewMatrix;
-    private Matrix4 transMatrix;
-    private BitmapFont bitmapFont;
-    private SpriteBatch spriteBatch;
+    private final Texture texture;
+    private final Matrix4 viewMatrix;
+    private final Matrix4 transMatrix;
+    private final BitmapFont bitmapFont;
+    private final BitmapFont bitmapTitleFont;
+    private final SpriteBatch spriteBatch;
     
     public LoadingScreen(String id){
         super(id);
@@ -33,7 +34,7 @@ public class LoadingScreen extends BaseScreen{
         loaded = false;
         visible = false;
         
-        gameTitle = "} Shooter";
+        gameTitle = "   }\nShooter";
         
         texture = new Texture("static_images/space_background_dark_1.jpg");
         viewMatrix = new Matrix4();
@@ -41,6 +42,7 @@ public class LoadingScreen extends BaseScreen{
         spriteBatch = new SpriteBatch();
         
         bitmapFont = new BitmapFont(Gdx.files.internal("fonts/space_age.fnt"));
+        bitmapTitleFont = new BitmapFont(Gdx.files.internal("fonts/space_age/big_bold/space_age.fnt"));
     }
 
     @Override
@@ -81,8 +83,8 @@ public class LoadingScreen extends BaseScreen{
          * Escala e desenha a fonte na tela
          */
         
-        bitmapFont.getData().setScale(2);
-        bitmapFont.draw(spriteBatch, gameTitle, 375, 600);
+        bitmapTitleFont.getData().setScale(1.5f);
+        bitmapTitleFont.draw(spriteBatch, gameTitle, 410, 500);
         
         bitmapFont.getData().setScale(1);
         if (!loaded) bitmapFont.draw(spriteBatch,
