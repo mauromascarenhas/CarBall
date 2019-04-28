@@ -18,12 +18,15 @@ import com.badlogic.gdx.graphics.g3d.Model;
 
 public class SpaceShooterGame extends Game implements InputProcessor {
     
-    private BaseScreen currentScreen;
-    private DifficultySelector selectedDifficulty;
+    public static long highestScore = 0;
+    
+    public static boolean DEBUG = false;
     
     public static AssetManager assetManager;
     public static ModelBuilder modelBuider;
-    public static boolean DEBUG = false;
+    
+    private BaseScreen currentScreen;
+    private DifficultySelector selectedDifficulty;
 
     @Override
     public void create() {

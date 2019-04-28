@@ -1,5 +1,6 @@
 package br.edu.ufabc.ipj.spaceshooter.core.gamelogic;
 
+import br.edu.ufabc.ipj.spaceshooter.SpaceShooterGame;
 import br.edu.ufabc.ipj.spaceshooter.core.GameObject;
 import br.edu.ufabc.ipj.spaceshooter.model.AbstractModel;
 import br.edu.ufabc.ipj.spaceshooter.model.Asteroid;
@@ -22,6 +23,7 @@ public class GameAction {
     // Set done on destroy
     public boolean isDone;
     public boolean canProceed;
+    public boolean canShowScore;
     
     public boolean canShot;
     
@@ -64,6 +66,8 @@ public class GameAction {
     public GameAction(ModelSelector selected,
                         DifficultySelector difficulty){
         this.isDone = false;
+        this.canProceed = false;
+        this.canShowScore = false;
         
         this.score = 0;
         this.lives = 3;
@@ -176,6 +180,7 @@ public class GameAction {
         else lostTimer += delta;
         
         if (lostTimer >= 4) this.canProceed = true;
+        else if (lostTimer >= 2) this.canShowScore = true;
         
         this.canShot = shotTimer > SHOT_RELOAD;
         
@@ -209,6 +214,8 @@ public class GameAction {
                 if (objects.get(i).collidesWith(objects.get(0)))
                     if (this.lives == 1){
                         objects.first().getGameObject().setVisible(false);
+                        if (SpaceShooterGame.highestScore < this.score)
+                            SpaceShooterGame.highestScore = this.score;
                         this.lives--;
                     }
                     else {
@@ -259,7 +266,7 @@ public class GameAction {
         else if (Commands.hasCommand(Commands.Command.RIGHT) && cPos.x < 25) 
             objects.first().getGameObject().transform.translate(-SPACECRAFT_SPEED * delta / SPACECRAFT_SCALE, 0, 0);
         
-        if (Commands.hasCommand(Commands.Command.SHOT) && canShot){
+        if (Commands.hasCommand(Commands.Command.SHOT) && canShot && lives > 0){
             Vector3 spaceCraftPos = new Vector3();
             objects.first().getGameObject().transform.getTranslation(spaceCraftPos);
             

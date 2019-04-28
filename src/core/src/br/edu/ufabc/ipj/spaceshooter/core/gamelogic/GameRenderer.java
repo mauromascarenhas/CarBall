@@ -1,5 +1,6 @@
 package br.edu.ufabc.ipj.spaceshooter.core.gamelogic;
 
+import br.edu.ufabc.ipj.spaceshooter.SpaceShooterGame;
 import br.edu.ufabc.ipj.spaceshooter.model.AbstractModel;
 import br.edu.ufabc.ipj.spaceshooter.utils.Utilities;
 import com.badlogic.gdx.Gdx;
@@ -32,6 +33,7 @@ public class GameRenderer {
     private final Matrix4 viewMatrix;
     private final Matrix4 transMatrix;
     private final BitmapFont bitmapFont;
+    private final BitmapFont bitmapTitleFont;
     private final SpriteBatch spriteBatch;
     
     public GameRenderer(GameAction action){
@@ -46,6 +48,7 @@ public class GameRenderer {
         life_symb = new Texture("static_images/spacecraft_icon.png");
         
         bitmapFont = new BitmapFont(Gdx.files.internal("fonts/space_age/big/space_age.fnt"));
+        bitmapTitleFont = new BitmapFont(Gdx.files.internal("fonts/space_age/big_bold/space_age.fnt"));
         
         viewMatrix = new Matrix4();
         transMatrix = new Matrix4();
@@ -74,9 +77,22 @@ public class GameRenderer {
         spriteBatch.setTransformMatrix(transMatrix);
         
         spriteBatch.begin();
+        // Background drawing
         spriteBatch.draw(texture, 0, 0, Utilities.GAME_WIDTH, Utilities.GAME_HEIGHT, 0, 0,
                             2048, 1152, false, false);
+        spriteBatch.end();
         
+        // Render 3D objects
+        modelBatch.begin(camera);
+        for (AbstractModel o : gameAction.shots)
+            if (o.getGameObject().isVisible()) modelBatch.render(o.getGameObject(), environment);
+        for (AbstractModel o : gameAction.objects)
+            if (o.getGameObject().isVisible()) modelBatch.render(o.getGameObject(), environment);
+        modelBatch.end();
+        
+        
+        // HUD drawing
+        spriteBatch.begin();
         if (gameAction.canShot && gameAction.lives > 0)
             spriteBatch.draw(shot_symb, 1250, 40, 60.0f, 60.0f, 0, 0, 512, 512, false, false);
         
@@ -86,19 +102,8 @@ public class GameRenderer {
         bitmapFont.getData().setScale(1);
         if (gameAction.lives > 0)
             bitmapFont.draw(spriteBatch, String.format("SCORE : %d", gameAction.score), 50.0f, 650.0f);
-        spriteBatch.end();
-        
-        modelBatch.begin(camera);
-        for (AbstractModel o : gameAction.shots)
-            if (o.getGameObject().isVisible()) modelBatch.render(o.getGameObject(), environment);
-        for (AbstractModel o : gameAction.objects)
-            if (o.getGameObject().isVisible()) modelBatch.render(o.getGameObject(), environment);
-        modelBatch.end();
-        
-        if (gameAction.lives < 1){
-            if (overlay_alpha < 0.7f) overlay_alpha += (0.2f * delta);
-            
-            spriteBatch.begin();
+        else {
+            if (overlay_alpha < 0.7f) overlay_alpha += (0.3f * delta);
             spriteBatch.enableBlending();
             
             black_sprite = new Sprite(black_ovl, Utilities.GAME_WIDTH - 100, Utilities.GAME_HEIGHT - 80);
@@ -106,11 +111,22 @@ public class GameRenderer {
             black_sprite.setPosition(50, 40);
             black_sprite.draw(spriteBatch);
             
+            if (gameAction.canShowScore){
+                bitmapTitleFont.getData().setScale(0.75f);
+                bitmapTitleFont.draw(spriteBatch, "CURRENT SCORE", 400, 600);
+                bitmapTitleFont.getData().setScale(1);
+                bitmapTitleFont.draw(spriteBatch, "HIGHEST SCORE", 350, 400);
+                bitmapTitleFont.draw(spriteBatch, String.format("%019d", SpaceShooterGame.highestScore),
+                                                                150, 300);
+
+                bitmapFont.draw(spriteBatch, String.format("%019d", gameAction.score), 170, 500);
+            }
+            
             if (gameAction.canProceed)
                 bitmapFont.draw(spriteBatch, "<- SHOT TO CONTINUE ->", 200, 100);
-            
-            spriteBatch.end();
         }
+        
+        spriteBatch.end();
         
         camera.update();
     }

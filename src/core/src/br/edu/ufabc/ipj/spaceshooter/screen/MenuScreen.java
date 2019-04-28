@@ -2,6 +2,7 @@ package br.edu.ufabc.ipj.spaceshooter.screen;
 
 import br.edu.ufabc.ipj.spaceshooter.utils.Commands;
 import br.edu.ufabc.ipj.spaceshooter.utils.DifficultySelector;
+import br.edu.ufabc.ipj.spaceshooter.utils.MenuItem;
 import br.edu.ufabc.ipj.spaceshooter.utils.Utilities;
 import com.badlogic.gdx.Gdx;
 import com.badlogic.gdx.graphics.GL20;
@@ -12,17 +13,17 @@ import com.badlogic.gdx.math.Matrix4;
 
 public class MenuScreen extends BaseScreen {
 
-    enum Coordinate{
+    private enum Coordinate{
         X,
         Y
     };
     
+    public MenuItem hoveredItem;
     public DifficultySelector selectedDifficulty;
     
-    private boolean hadCommand;
-    private boolean playHovered;
-    private boolean quitHovered;
-    private boolean creditsHovered;
+    private int oldXCoord, oldYCoord;
+    
+    private boolean hadKeyCommand;
     
     private final String gameTitle;
     
@@ -40,11 +41,12 @@ public class MenuScreen extends BaseScreen {
     public MenuScreen(String id, DifficultySelector difficulty){
         super(id);
         
-        hadCommand = false;
+        hadKeyCommand = Commands.hasCommand();
         
-        playHovered = false;
-        quitHovered = false;
-        creditsHovered = false;
+        oldXCoord = Gdx.input.getX();
+        oldYCoord = Gdx.input.getY();
+        
+        hoveredItem = MenuItem.PLAY;
         
         gameTitle = "   }\nShooter";
         selectedDifficulty = difficulty;
@@ -68,30 +70,42 @@ public class MenuScreen extends BaseScreen {
     
     @Override
     public void update(float delta) {
-        if (!hadCommand && Commands.set[Commands.Command.LEFT.getValue()])
-            changeDifficulty(Commands.Command.LEFT);
-        else if (!hadCommand && Commands.set[Commands.Command.RIGHT.getValue()])
-            changeDifficulty(Commands.Command.RIGHT);
-        else hadCommand = Commands.hasCommand();
+        // Gives priority to keyboard commands
+        if (!hadKeyCommand && Commands.hasCommand()){
+            if (Commands.hasCommand(Commands.Command.UP))
+                changeSelection(Commands.Command.UP);
+            else if (Commands.hasCommand(Commands.Command.DOWN))
+                changeSelection(Commands.Command.DOWN);
+            else if (Commands.hasCommand(Commands.Command.SHOT))
+                setDone(true);
+            else if (hoveredItem == MenuItem.PLAY){
+                if (Commands.hasCommand(Commands.Command.LEFT))
+                    changeDifficulty(Commands.Command.LEFT);
+                else if (Commands.hasCommand(Commands.Command.RIGHT))
+                    changeDifficulty(Commands.Command.RIGHT);
+            }
+            return;
+        }
+        else hadKeyCommand = Commands.hasCommand();
         
         int xCoord = toGameCoordinates(Coordinate.X, Gdx.input.getX()),
             yCoord = toGameCoordinates(Coordinate.Y, Gdx.input.getY());
         
-        playHovered = false;
-        quitHovered = false;
-        creditsHovered = false;
-        
-        if (xCoord >= 100 && yCoord >= 220){
+        if (yCoord >= 220 && (oldXCoord != xCoord || oldYCoord != yCoord)
+                || Gdx.input.justTouched()){
+            oldXCoord = xCoord;
+            oldYCoord = yCoord;
+            
             if (yCoord < 315){
-                quitHovered = true;
+                hoveredItem = MenuItem.QUIT;
                 if (Gdx.input.justTouched()) System.exit(0);
             }
             else if (yCoord < 415){
-                creditsHovered = true;
+                hoveredItem = MenuItem.CREDITS;
                 if (Gdx.input.justTouched()) /*TODO : Implement Credits Screen*/;
             }
             else if (yCoord < 500){
-                playHovered = true;
+                hoveredItem = MenuItem.PLAY;
                 if (Gdx.input.justTouched()){
                     if (xCoord < 390 || xCoord > 800) setDone(true);
                     else changeDifficulty(xCoord < 600 ? Commands.Command.LEFT : Commands.Command.RIGHT);
@@ -116,18 +130,30 @@ public class MenuScreen extends BaseScreen {
         bitmapTitleFont.getData().setScale(1.25f);
         bitmapTitleFont.draw(spriteBatch, gameTitle, 450, 620);
         
-        bitmapFont.getData().setScale(playHovered ? 1.25f : 1.0f);
+        bitmapFont.getData().setScale(hoveredItem == MenuItem.PLAY ? 1.25f : 1.0f);
         bitmapFont.draw(spriteBatch, "PLAY < " + selectedDifficulty.toString() + " >", 100, 450);
-        bitmapFont.getData().setScale(creditsHovered ? 1.25f : 1.0f);
+        bitmapFont.getData().setScale(hoveredItem == MenuItem.CREDITS ? 1.25f : 1.0f);
         bitmapFont.draw(spriteBatch, "CREDITS", 100, 350);
-        bitmapFont.getData().setScale(quitHovered ? 1.25f : 1.0f);
+        bitmapFont.getData().setScale(hoveredItem == MenuItem.QUIT ? 1.25f : 1.0f);
         bitmapFont.draw(spriteBatch, "QUIT", 100, 250);
         
         spriteBatch.end();
     }
     
+    private void changeSelection(Commands.Command command){
+        hadKeyCommand = true;
+        if (!(command == Commands.Command.UP || command == Commands.Command.DOWN)) return;
+        
+        int i = hoveredItem.getValue();
+        if (command == Commands.Command.DOWN) hoveredItem = MenuItem.fromInteger(++i > MenuItem.QUIT.getValue() ? 
+                                                                                    MenuItem.PLAY.getValue() : i);
+        else hoveredItem = MenuItem.fromInteger(--i == 0 ? MenuItem.QUIT.getValue() : i);
+    }
+    
     private void changeDifficulty(Commands.Command command){
-        hadCommand = true;
+        hadKeyCommand = true;
+        if (!(command == Commands.Command.RIGHT || command == Commands.Command.LEFT)) return;
+        
         int i = selectedDifficulty.getValue();
         if (command == Commands.Command.RIGHT) selectedDifficulty = DifficultySelector.fromInteger(++i > DifficultySelector.HARD.getValue() ? 
                                                                                                         DifficultySelector.EASY.getValue() : i);

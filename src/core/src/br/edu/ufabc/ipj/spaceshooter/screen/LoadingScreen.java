@@ -1,6 +1,7 @@
 package br.edu.ufabc.ipj.spaceshooter.screen;
 
 import br.edu.ufabc.ipj.spaceshooter.SpaceShooterGame;
+import br.edu.ufabc.ipj.spaceshooter.utils.Commands;
 import com.badlogic.gdx.Gdx;
 import com.badlogic.gdx.graphics.GL20;
 import com.badlogic.gdx.graphics.Texture;
@@ -15,6 +16,7 @@ public class LoadingScreen extends BaseScreen{
     private float time;
     private boolean loaded;
     private boolean visible;
+    private boolean hadKeyCommand;
     
     private final String gameTitle;
     
@@ -33,6 +35,7 @@ public class LoadingScreen extends BaseScreen{
         
         loaded = false;
         visible = false;
+        hadKeyCommand = false;
         
         gameTitle = "   }\nShooter";
         
@@ -61,9 +64,11 @@ public class LoadingScreen extends BaseScreen{
         }
         else loaded = true;
         
-        if (loaded && Gdx.input.justTouched()){
+        if ((loaded && Gdx.input.justTouched()) ||
+                (loaded && (!hadKeyCommand && Commands.hasCommand(Commands.Command.SHOT)))){
             setDone(true);
         }
+        else hadKeyCommand = Commands.hasCommand(Commands.Command.SHOT);
     }
 
     @Override
