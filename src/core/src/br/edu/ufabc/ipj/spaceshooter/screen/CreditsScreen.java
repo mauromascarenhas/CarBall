@@ -1,5 +1,6 @@
 package br.edu.ufabc.ipj.spaceshooter.screen;
 
+import br.edu.ufabc.ipj.spaceshooter.SpaceShooterGame;
 import br.edu.ufabc.ipj.spaceshooter.utils.Commands;
 import br.edu.ufabc.ipj.spaceshooter.utils.Utilities;
 import com.badlogic.gdx.Gdx;
@@ -25,6 +26,7 @@ public class CreditsScreen extends BaseScreen {
     private final String gameCredits;
     
     private final Texture texture;
+    private final Texture tBackBtn;
     private final Matrix4 viewMatrix;
     private final Matrix4 transMatrix;
     private final BitmapFont bitmapTitleFont;
@@ -60,11 +62,35 @@ public class CreditsScreen extends BaseScreen {
                         + "      05 ~ Tristan Lohengrin\n"
                         + "        (CC - BY)"
                         + "\n\n3D Models:\n"
-                        + "    Free3D [Insert] (CC-BY)"
+                        + "    - 3D Scifi pedestal\n"
+                        + "    turntable model ~ Bill\n"
+                        + "      Nguyen (RFL)\n\n"
+                        + "    - Rudymnv Cosair\n"
+                        + "      ~ rUDYmNV (RFL)\n\n"
+                        + "    - SF Fighter 3D model\n"
+                        + "      ~ CGPitbull (RFL)\n\n"
+                        + "    - Asteroid ~ Printable\n"
+                        + "      Models (Personal use)\n\n"
+                        + "    - Cargo Starship\n"
+                        + "      ~ Herminio Nieves\n"
+                        + "        (CC-BY)\n\n"
+                        + "    - AMRAAM Missile 3D\n"
+                        + "      model ~ CadNav\n"
+                        + "        (Personal use)\n\n"
+                        + "    - Intergalactic\n"
+                        + "      Spaceship ~ Dennis\n"
+                        + "        Haupt (Personal use)\n\n"
+                        + "    - Shot\n"
+                        + "      ~ Mauro Mascarenhas\n"
+                        + "        (CC-BY-SA)"
                         + "\n\nFonts:\n"
-                        + "    Free3D [Insert] (CC-BY)";
+                        + "    - Space Age\n"
+                        + "      ~ Justin Callaghan\n"
+                        + "        (Personal use)";
         
         texture = new Texture("static_images/space_background_dark_1.jpg");
+        tBackBtn = new Texture("static_images/back_icon.png");
+        
         viewMatrix = new Matrix4();
         transMatrix = new Matrix4();
         spriteBatch = new SpriteBatch();
@@ -84,7 +110,9 @@ public class CreditsScreen extends BaseScreen {
     @Override
     public void update(float delta) {
         // Gives priority to keyboard commands
-        if (!hadKeyCommand && Commands.hasCommand(Commands.Command.SHOT)){
+        if (!hadKeyCommand && (Commands.hasCommand(Commands.Command.SHOT) || 
+                Commands.hasCommand(Commands.Command.ESCAPE))){
+            SpaceShooterGame.playMenuSelectionBeep();
             this.setDone(true);
             return;
         }
@@ -93,12 +121,18 @@ public class CreditsScreen extends BaseScreen {
         int xCoord = toGameCoordinates(Coordinate.X, Gdx.input.getX()),
             yCoord = toGameCoordinates(Coordinate.Y, Gdx.input.getY());
         
+        if (batchOffset > 4120 ||
+                (yCoord >= 630  && yCoord <= 730
+                        && xCoord <= 150 && xCoord >= 50 
+                        && Gdx.input.justTouched())){
+            SpaceShooterGame.playMenuSelectionBeep();
+            this.setDone(true);
+        }
+        
+        // Increases timer and offset
         if (countTimer > 3.0f)
             batchOffset += (30 * delta);
         else countTimer += delta;
-        
-        this.setDone(batchOffset > 2200 ||
-                (yCoord >= 650 && xCoord <= 150 && Gdx.input.justTouched()));
     }
 
     @Override
@@ -118,6 +152,8 @@ public class CreditsScreen extends BaseScreen {
         bitmapTitleFont.draw(spriteBatch, gameTitle, 450, 620 + batchOffset);
         bitmapTitleFont.getData().setScale(1.00f);
         bitmapTitleFont.draw(spriteBatch, gameCredits, 100, 400 + batchOffset);
+        
+        spriteBatch.draw(tBackBtn, 50, 630, 100.0f, 100.0f, 0, 0, 512, 512, false, false);
         
         spriteBatch.end();
     }

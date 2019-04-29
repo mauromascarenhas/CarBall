@@ -14,6 +14,7 @@ import br.edu.ufabc.ipj.spaceshooter.screen.SpaceshipSelectionScreen;
 import br.edu.ufabc.ipj.spaceshooter.utils.Commands;
 import br.edu.ufabc.ipj.spaceshooter.utils.DifficultySelector;
 import br.edu.ufabc.ipj.spaceshooter.utils.MenuItem;
+import br.edu.ufabc.ipj.spaceshooter.utils.ModelSelector;
 import com.badlogic.gdx.Input;
 import com.badlogic.gdx.assets.loaders.resolvers.InternalFileHandleResolver;
 import com.badlogic.gdx.audio.Music;
@@ -102,8 +103,12 @@ public class SpaceShooterGame extends Game implements InputProcessor {
                         new SpaceshipSelectionScreen("selection") :
                         new CreditsScreen("credits");
             }
-            else if (currentId.equals("selection")) currentScreen = new GameScreen("game", ((SpaceshipSelectionScreen)currentScreen).getSelected(),
-                                                                                    selectedDifficulty);
+            else if (currentId.equals("selection")){
+                ModelSelector selectedModel = ((SpaceshipSelectionScreen)currentScreen).getSelected();
+                currentScreen = selectedModel == ModelSelector.SCIFI_UNDFINED ?
+                        new MenuScreen("menu", selectedDifficulty) :
+                        new GameScreen("game", selectedModel, selectedDifficulty);
+            }
             else if (currentId.equals("game") || currentId.equals("credits"))
                 currentScreen = new MenuScreen("menu");
     }
@@ -140,6 +145,9 @@ public class SpaceShooterGame extends Game implements InputProcessor {
             case Input.Keys.SPACE:
                 Commands.set[Commands.Command.SHOT.getValue()] = true;
                 return true;
+            case Input.Keys.ESCAPE:
+                Commands.set[Commands.Command.ESCAPE.getValue()] = true;
+                return true;
         }
         return false;
     }
@@ -161,6 +169,9 @@ public class SpaceShooterGame extends Game implements InputProcessor {
                 return true;
             case Input.Keys.SPACE:
                 Commands.set[Commands.Command.SHOT.getValue()] = false;
+                return true;
+            case Input.Keys.ESCAPE:
+                Commands.set[Commands.Command.ESCAPE.getValue()] = false;
                 return true;
         }
         return false;

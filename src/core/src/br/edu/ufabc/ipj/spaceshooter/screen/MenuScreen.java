@@ -102,28 +102,32 @@ public class MenuScreen extends BaseScreen {
         int xCoord = toGameCoordinates(Coordinate.X, Gdx.input.getX()),
             yCoord = toGameCoordinates(Coordinate.Y, Gdx.input.getY());
         
+        boolean canBeep = true;
         if (yCoord >= 220 && (oldXCoord != xCoord || oldYCoord != yCoord)
                 || Gdx.input.justTouched()){
             oldXCoord = xCoord;
             oldYCoord = yCoord;
             
             if (yCoord < 315){
+                canBeep = (hoveredItem != MenuItem.QUIT);
                 hoveredItem = MenuItem.QUIT;
                 if (Gdx.input.justTouched()){
                     SpaceShooterGame.playMenuSelectionBeep();
                     System.exit(0);
                 }
-                else SpaceShooterGame.playMenuHoveringBeep();
+                else if (canBeep) SpaceShooterGame.playMenuHoveringBeep();
             }
             else if (yCoord < 415){
+                canBeep = (hoveredItem != MenuItem.CREDITS);
                 hoveredItem = MenuItem.CREDITS;
                 if (Gdx.input.justTouched()){
                     SpaceShooterGame.playMenuSelectionBeep();
                     this.setDone(true);
                 }
-                else SpaceShooterGame.playMenuHoveringBeep();
+                else if (canBeep) SpaceShooterGame.playMenuHoveringBeep();
             }
             else if (yCoord < 500){
+                canBeep = (hoveredItem != MenuItem.PLAY);
                 hoveredItem = MenuItem.PLAY;
                 if (Gdx.input.justTouched()){
                     if (xCoord < 390 || xCoord > 800){
@@ -135,6 +139,7 @@ public class MenuScreen extends BaseScreen {
                         changeDifficulty(xCoord < 600 ? Commands.Command.LEFT : Commands.Command.RIGHT);
                     }
                 }
+                else if (canBeep) SpaceShooterGame.playMenuHoveringBeep();
             }
         }
     }

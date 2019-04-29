@@ -1,5 +1,6 @@
 package br.edu.ufabc.ipj.spaceshooter.screen;
 
+import br.edu.ufabc.ipj.spaceshooter.SpaceShooterGame;
 import br.edu.ufabc.ipj.spaceshooter.core.spaceshipselection.SpaceShipSelectionAction;
 import br.edu.ufabc.ipj.spaceshooter.core.spaceshipselection.SpaceShipSelectionRenderer;
 import br.edu.ufabc.ipj.spaceshooter.utils.Commands;
@@ -9,11 +10,11 @@ import com.badlogic.gdx.audio.Music;
 
 public class SpaceshipSelectionScreen extends BaseScreen{
 
-    private Music ssSelectionBeep;
+    private final Music ssSelectionBeep;
     private ModelSelector selected;
     
-    private SpaceShipSelectionAction gameAction;
-    private SpaceShipSelectionRenderer renderer;
+    private final SpaceShipSelectionAction gameAction;
+    private final SpaceShipSelectionRenderer renderer;
     
     public SpaceshipSelectionScreen(String id){
         super(id);
@@ -32,9 +33,13 @@ public class SpaceshipSelectionScreen extends BaseScreen{
         
         if (Commands.hasCommand(Commands.Command.SHOT)){
             ssSelectionBeep.play();
-            
-            this.setDone(true);
             this.setSelected(gameAction.currentSelection);
+            this.setDone(true);
+        }
+        else if (Commands.hasCommand(Commands.Command.ESCAPE)){
+            SpaceShooterGame.playMenuSelectionBeep();
+            this.setSelected(ModelSelector.SCIFI_UNDFINED);
+            this.setDone(true);
         }
     }
 
