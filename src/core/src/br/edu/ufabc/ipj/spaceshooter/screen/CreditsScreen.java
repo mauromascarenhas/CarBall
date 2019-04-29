@@ -16,30 +16,59 @@ public class CreditsScreen extends BaseScreen {
         Y
     };
     
+    private float countTimer;
+    private float batchOffset;
+    
     private boolean hadKeyCommand;
     
     private final String gameTitle;
+    private final String gameCredits;
     
     private final Texture texture;
     private final Matrix4 viewMatrix;
     private final Matrix4 transMatrix;
-    private final BitmapFont bitmapFont;
     private final BitmapFont bitmapTitleFont;
     private final SpriteBatch spriteBatch;
     
     public CreditsScreen(String id){
         super(id);
         
+        countTimer = 0;
+        batchOffset = 0;
+        
         hadKeyCommand = Commands.hasCommand();
         
         gameTitle = "   }\nShooter";
+        
+        gameCredits = "Game logic developer:\n"
+                        + "    Mauro Mascarenhas de\n    Araújo" 
+                        + "\n\nSpecial thanks to:\n"
+                        + "    Francisco Isidro\n    Masseto"
+                        + "\n\nHUD icons by:\n    Freepik (CC-BY)"
+                        + "\n\nSoundtrack:\n"
+                        + "    - 8-Bit Explosion 04\n"
+                        + "       ~ Little Robot Sound\n"
+                        + "       Factory (CC-BY)\n\n"
+                        + "    - Retro Explosion 05\n"
+                        + "       ~ MATTIX (CC-BY)\n\n"
+                        + "    - Laser3 ~ NS Studios\n"
+                        + "        (CC - BY)\n\n"
+                        + "    - Spaceship Atmosphere\n"
+                        + "      04 ~ Tristan Lohengrin\n"
+                        + "        (CC - BY)\n\n"
+                        + "    - Spaceship Atmosphere\n"
+                        + "      05 ~ Tristan Lohengrin\n"
+                        + "        (CC - BY)"
+                        + "\n\n3D Models:\n"
+                        + "    Free3D [Insert] (CC-BY)"
+                        + "\n\nFonts:\n"
+                        + "    Free3D [Insert] (CC-BY)";
         
         texture = new Texture("static_images/space_background_dark_1.jpg");
         viewMatrix = new Matrix4();
         transMatrix = new Matrix4();
         spriteBatch = new SpriteBatch();
         
-        bitmapFont = new BitmapFont(Gdx.files.internal("fonts/space_age/big/space_age.fnt"));
         bitmapTitleFont = new BitmapFont(Gdx.files.internal("fonts/space_age/big_bold/space_age.fnt"));
     }
     
@@ -47,6 +76,7 @@ public class CreditsScreen extends BaseScreen {
     public void dispose() {
         texture.dispose();
         spriteBatch.dispose();
+        bitmapTitleFont.dispose();
         
         super.dispose();
     }
@@ -63,8 +93,12 @@ public class CreditsScreen extends BaseScreen {
         int xCoord = toGameCoordinates(Coordinate.X, Gdx.input.getX()),
             yCoord = toGameCoordinates(Coordinate.Y, Gdx.input.getY());
         
-        if (yCoord >= 650 && xCoord <= 150 && Gdx.input.justTouched())
-            this.setDone(true);
+        if (countTimer > 3.0f)
+            batchOffset += (30 * delta);
+        else countTimer += delta;
+        
+        this.setDone(batchOffset > 2200 ||
+                (yCoord >= 650 && xCoord <= 150 && Gdx.input.justTouched()));
     }
 
     @Override
@@ -81,7 +115,9 @@ public class CreditsScreen extends BaseScreen {
                             2000, 1500, false, false);
         
         bitmapTitleFont.getData().setScale(1.25f);
-        bitmapTitleFont.draw(spriteBatch, gameTitle, 450, 620);
+        bitmapTitleFont.draw(spriteBatch, gameTitle, 450, 620 + batchOffset);
+        bitmapTitleFont.getData().setScale(1.00f);
+        bitmapTitleFont.draw(spriteBatch, gameCredits, 100, 400 + batchOffset);
         
         spriteBatch.end();
     }

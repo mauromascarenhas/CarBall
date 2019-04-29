@@ -6,12 +6,14 @@ import com.badlogic.gdx.InputProcessor;
 import com.badlogic.gdx.assets.AssetManager;
 import com.badlogic.gdx.graphics.g3d.utils.ModelBuilder;
 import br.edu.ufabc.ipj.spaceshooter.screen.BaseScreen;
+import br.edu.ufabc.ipj.spaceshooter.screen.CreditsScreen;
 import br.edu.ufabc.ipj.spaceshooter.screen.GameScreen;
 import br.edu.ufabc.ipj.spaceshooter.screen.LoadingScreen;
 import br.edu.ufabc.ipj.spaceshooter.screen.MenuScreen;
 import br.edu.ufabc.ipj.spaceshooter.screen.SpaceshipSelectionScreen;
 import br.edu.ufabc.ipj.spaceshooter.utils.Commands;
 import br.edu.ufabc.ipj.spaceshooter.utils.DifficultySelector;
+import br.edu.ufabc.ipj.spaceshooter.utils.MenuItem;
 import com.badlogic.gdx.Input;
 import com.badlogic.gdx.assets.loaders.resolvers.InternalFileHandleResolver;
 import com.badlogic.gdx.audio.Music;
@@ -96,11 +98,14 @@ public class SpaceShooterGame extends Game implements InputProcessor {
             if(currentId.equals("loading")) currentScreen = new MenuScreen("menu", selectedDifficulty);
             else if (currentId.equals("menu")){
                 selectedDifficulty = ((MenuScreen)currentScreen).selectedDifficulty;
-                currentScreen = new SpaceshipSelectionScreen("selection");
+                currentScreen = ((MenuScreen)currentScreen).hoveredItem.equals(MenuItem.PLAY) ?
+                        new SpaceshipSelectionScreen("selection") :
+                        new CreditsScreen("credits");
             }
             else if (currentId.equals("selection")) currentScreen = new GameScreen("game", ((SpaceshipSelectionScreen)currentScreen).getSelected(),
                                                                                     selectedDifficulty);
-            else if (currentId.equals("game")) currentScreen = new MenuScreen("menu");
+            else if (currentId.equals("game") || currentId.equals("credits"))
+                currentScreen = new MenuScreen("menu");
     }
     
     public static void playMenuHoveringBeep(){

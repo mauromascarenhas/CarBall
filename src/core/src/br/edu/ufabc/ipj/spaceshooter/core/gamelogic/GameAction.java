@@ -64,8 +64,11 @@ public class GameAction {
     private boolean isInvulnerable;
     private final boolean IS_MISSILE;
     
-    private Music firstSong;
-    private Music secondSong;
+    private final Music firstSong;
+    private final Music secondSong;
+    private final Music shootingSong;
+    private final Music aExplosionSong;
+    private final Music sExplosionSong;
     
     protected Array<AbstractModel> shots;            
     protected Array<AbstractModel> objects;
@@ -182,6 +185,11 @@ public class GameAction {
         
         firstSong = Gdx.audio.newMusic(Gdx.files.internal("songs/soundtrack/playing_song_1.wav"));
         secondSong = Gdx.audio.newMusic(Gdx.files.internal("songs/soundtrack/playing_song_2.wav"));
+        shootingSong = Gdx.audio.newMusic(Gdx.files.internal(IS_MISSILE ? 
+                                                    "songs/shot/missile_shot.wav" :
+                                                    "songs/shot/laser_shot.wav"));
+        aExplosionSong = Gdx.audio.newMusic(Gdx.files.internal("songs/explosion/asteroid_explosion.wav"));
+        sExplosionSong = Gdx.audio.newMusic(Gdx.files.internal("songs/explosion/spaceship_explosion.wav"));
         
         if (SpaceShooterGame.backgroundSong.isPlaying())
             SpaceShooterGame.backgroundSong.pause();
@@ -253,6 +261,7 @@ public class GameAction {
                         
                         if (!SpaceShooterGame.backgroundSong.isPlaying())
                                     SpaceShooterGame.backgroundSong.play();
+                        sExplosionSong.play();
                         
                         Vector3 sShipPos = new Vector3();
                         objects.first().getGameObject().transform.getTranslation(sShipPos);
@@ -280,6 +289,9 @@ public class GameAction {
             
             for (int k = shots.size - 1; k > -1; --k)
                 if (shots.get(k).collidesWith(objects.get(i))){
+                    aExplosionSong.stop();
+                    aExplosionSong.play();
+                    
                     objects.removeIndex(i);
                     shots.removeIndex(k);
                     score += (100 * DIFFICULTY.getValue());
@@ -288,7 +300,7 @@ public class GameAction {
         }
         
         if (asteroidTimer >= ASTEROID_TSPAWN){
-            float sortedPos = (float)(Math.random() * 61.0 - 30.0) / ASTEROID_SCALE;
+            float sortedPos = (float)(Math.random() * 51.0 - 25.0) / ASTEROID_SCALE;
             
             for (int i = 0; i < DIFFICULTY.getValue(); ++i){
                 if (Math.random() < 0.5 && i != 0) continue;
@@ -321,6 +333,9 @@ public class GameAction {
         if (Commands.hasCommand(Commands.Command.SHOT) && canShot && lives > 0){
             Vector3 spaceCraftPos = new Vector3();
             objects.first().getGameObject().transform.getTranslation(spaceCraftPos);
+            
+            shootingSong.stop();
+            shootingSong.play();
             
             AbstractModel newShot = IS_MISSILE ? new Missile() : new Shot();
             for (Material mat : newShot.getGameObject().materials)
