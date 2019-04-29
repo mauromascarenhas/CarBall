@@ -88,6 +88,15 @@ public class GameRenderer {
             if (o.getGameObject().isVisible()) modelBatch.render(o.getGameObject(), environment);
         for (AbstractModel o : gameAction.objects)
             if (o.getGameObject().isVisible()) modelBatch.render(o.getGameObject(), environment);
+        
+        /*if (!gameAction.canShowScore && gameAction.lives < 1){
+            SpaceShooterGame.particleSystem.update(delta/20);
+            SpaceShooterGame.particleSystem.begin();
+            SpaceShooterGame.particleSystem.draw();
+            SpaceShooterGame.particleSystem.end();
+            modelBatch.render(SpaceShooterGame.particleSystem, environment);
+        }*/
+        
         modelBatch.end();
         
         

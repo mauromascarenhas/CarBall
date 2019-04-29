@@ -13,8 +13,11 @@ import br.edu.ufabc.ipj.spaceshooter.model.Shot;
 import br.edu.ufabc.ipj.spaceshooter.utils.Commands;
 import br.edu.ufabc.ipj.spaceshooter.utils.DifficultySelector;
 import br.edu.ufabc.ipj.spaceshooter.utils.ModelSelector;
+import com.badlogic.gdx.Gdx;
+import com.badlogic.gdx.audio.Music;
 import com.badlogic.gdx.graphics.g3d.Material;
 import com.badlogic.gdx.graphics.g3d.attributes.ColorAttribute;
+import com.badlogic.gdx.graphics.g3d.particles.ParticleEffect;
 import com.badlogic.gdx.math.Vector3;
 import com.badlogic.gdx.utils.Array;
 
@@ -56,12 +59,19 @@ public class GameAction {
     private float asteroidTimer;
     private float invulnerabilityTimer;
     
+    private boolean isFirstSong;
     // Sets it spacecraft uses missiles instead
     private boolean isInvulnerable;
     private final boolean IS_MISSILE;
     
+    private Music firstSong;
+    private Music secondSong;
+    
     protected Array<AbstractModel> shots;            
     protected Array<AbstractModel> objects;
+    
+    protected ParticleEffect sExplosionEffect;
+    protected ParticleEffect aExplosionEffect;
     
     public GameAction(ModelSelector selected,
                         DifficultySelector difficulty){
@@ -84,6 +94,9 @@ public class GameAction {
         
         shots = new Array<AbstractModel>();
         objects = new Array<AbstractModel>();
+        
+        aExplosionEffect = SpaceShooterGame.assetManager.get("particles/asteroid_explosion", ParticleEffect.class).copy();
+        sExplosionEffect = SpaceShooterGame.assetManager.get("particles/spaceship_explosion", ParticleEffect.class).copy();
         
         float shotReloadTmp, spacecraftSpeedTmp,
                 asteroidSpeedTmp = Asteroid.getDefaultSpeed();
@@ -166,6 +179,28 @@ public class GameAction {
                 mat.remove(ColorAttribute.Emissive);
         
         objects.get(1).getGameObject().transform.translate(0, 0, -300.0f / ASTEROID_SCALE);
+        
+        firstSong = Gdx.audio.newMusic(Gdx.files.internal("songs/soundtrack/playing_song_1.wav"));
+        secondSong = Gdx.audio.newMusic(Gdx.files.internal("songs/soundtrack/playing_song_2.wav"));
+        
+        if (SpaceShooterGame.backgroundSong.isPlaying())
+            SpaceShooterGame.backgroundSong.pause();
+        
+        firstSong.setOnCompletionListener(new Music.OnCompletionListener() {
+            @Override
+            public void onCompletion(Music music) {
+                secondSong.setPosition(0);
+                secondSong.play();
+            }
+        });
+        secondSong.setOnCompletionListener(new Music.OnCompletionListener() {
+            @Override
+            public void onCompletion(Music music) {
+                firstSong.setPosition(0);
+                firstSong.play();
+            }
+        });
+        firstSong.play();
     }
     
     public void update(float delta){
@@ -213,9 +248,26 @@ public class GameAction {
             if (!this.isInvulnerable && this.lives > 0){
                 if (objects.get(i).collidesWith(objects.get(0)))
                     if (this.lives == 1){
+                        if (firstSong.isPlaying()) firstSong.pause();
+                        else secondSong.pause();
+                        
+                        if (!SpaceShooterGame.backgroundSong.isPlaying())
+                                    SpaceShooterGame.backgroundSong.play();
+                        
+                        Vector3 sShipPos = new Vector3();
+                        objects.first().getGameObject().transform.getTranslation(sShipPos);
+                        
                         objects.first().getGameObject().setVisible(false);
                         if (SpaceShooterGame.highestScore < this.score)
                             SpaceShooterGame.highestScore = this.score;
+                        
+                        sExplosionEffect.translate(sShipPos);
+                        sExplosionEffect.init();
+                        sExplosionEffect.start();
+                        
+                        sExplosionEffect.update(delta);
+                        SpaceShooterGame.particleSystem.add(sExplosionEffect);
+                        
                         this.lives--;
                     }
                     else {
@@ -278,6 +330,8 @@ public class GameAction {
             shotTimer = 0;
         }
         
-        if (this.canProceed && Commands.hasCommand(Commands.Command.SHOT)) this.isDone = true;
+        if (this.canProceed && 
+                (Commands.hasCommand(Commands.Command.SHOT) || Gdx.input.justTouched()))
+            this.isDone = true;
     }
 }

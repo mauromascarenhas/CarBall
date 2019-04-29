@@ -66,6 +66,7 @@ public class LoadingScreen extends BaseScreen{
         
         if ((loaded && Gdx.input.justTouched()) ||
                 (loaded && (!hadKeyCommand && Commands.hasCommand(Commands.Command.SHOT)))){
+            SpaceShooterGame.playMenuSelectionBeep();
             setDone(true);
         }
         else hadKeyCommand = Commands.hasCommand(Commands.Command.SHOT);

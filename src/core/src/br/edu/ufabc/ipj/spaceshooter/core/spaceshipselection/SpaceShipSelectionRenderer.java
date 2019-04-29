@@ -1,6 +1,5 @@
 package br.edu.ufabc.ipj.spaceshooter.core.spaceshipselection;
 
-import br.edu.ufabc.ipj.spaceshooter.SpaceShooterGame;
 import br.edu.ufabc.ipj.spaceshooter.model.AbstractModel;
 import br.edu.ufabc.ipj.spaceshooter.utils.Utilities;
 import com.badlogic.gdx.Gdx;
@@ -71,9 +70,6 @@ public class SpaceShipSelectionRenderer {
         for (AbstractModel o : gameAction.objects)
             if (o.getGameObject().isVisible()) modelBatch.render(o.getGameObject(), environment);
         
-        if (SpaceShooterGame.DEBUG)
-            for (AbstractModel o : gameAction.objects)
-                modelBatch.render(o.getGameObject().getBoxInstance(), environment);
         modelBatch.end();
         
         camera.update();

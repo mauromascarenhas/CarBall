@@ -1,5 +1,6 @@
 package br.edu.ufabc.ipj.spaceshooter.screen;
 
+import br.edu.ufabc.ipj.spaceshooter.SpaceShooterGame;
 import br.edu.ufabc.ipj.spaceshooter.utils.Commands;
 import br.edu.ufabc.ipj.spaceshooter.utils.DifficultySelector;
 import br.edu.ufabc.ipj.spaceshooter.utils.MenuItem;
@@ -72,17 +73,27 @@ public class MenuScreen extends BaseScreen {
     public void update(float delta) {
         // Gives priority to keyboard commands
         if (!hadKeyCommand && Commands.hasCommand()){
-            if (Commands.hasCommand(Commands.Command.UP))
+            if (Commands.hasCommand(Commands.Command.UP)){
+                SpaceShooterGame.playMenuHoveringBeep();
                 changeSelection(Commands.Command.UP);
-            else if (Commands.hasCommand(Commands.Command.DOWN))
+            }
+            else if (Commands.hasCommand(Commands.Command.DOWN)){
+                SpaceShooterGame.playMenuHoveringBeep();
                 changeSelection(Commands.Command.DOWN);
-            else if (Commands.hasCommand(Commands.Command.SHOT))
+            }
+            else if (Commands.hasCommand(Commands.Command.SHOT)){
+                SpaceShooterGame.playMenuSelectionBeep();
                 setDone(true);
+            }
             else if (hoveredItem == MenuItem.PLAY){
-                if (Commands.hasCommand(Commands.Command.LEFT))
+                if (Commands.hasCommand(Commands.Command.LEFT)){
+                    SpaceShooterGame.playMenuHoveringBeep();
                     changeDifficulty(Commands.Command.LEFT);
-                else if (Commands.hasCommand(Commands.Command.RIGHT))
+                }
+                else if (Commands.hasCommand(Commands.Command.RIGHT)){
+                    SpaceShooterGame.playMenuHoveringBeep();
                     changeDifficulty(Commands.Command.RIGHT);
+                }
             }
             return;
         }
@@ -98,17 +109,31 @@ public class MenuScreen extends BaseScreen {
             
             if (yCoord < 315){
                 hoveredItem = MenuItem.QUIT;
-                if (Gdx.input.justTouched()) System.exit(0);
+                if (Gdx.input.justTouched()){
+                    SpaceShooterGame.playMenuSelectionBeep();
+                    System.exit(0);
+                }
+                else SpaceShooterGame.playMenuHoveringBeep();
             }
             else if (yCoord < 415){
                 hoveredItem = MenuItem.CREDITS;
-                if (Gdx.input.justTouched()) /*TODO : Implement Credits Screen*/;
+                if (Gdx.input.justTouched()){
+                    SpaceShooterGame.playMenuSelectionBeep();
+                    this.setDone(true);
+                }
+                else SpaceShooterGame.playMenuHoveringBeep();
             }
             else if (yCoord < 500){
                 hoveredItem = MenuItem.PLAY;
                 if (Gdx.input.justTouched()){
-                    if (xCoord < 390 || xCoord > 800) setDone(true);
-                    else changeDifficulty(xCoord < 600 ? Commands.Command.LEFT : Commands.Command.RIGHT);
+                    if (xCoord < 390 || xCoord > 800){
+                        SpaceShooterGame.playMenuSelectionBeep();
+                        setDone(true);
+                    }
+                    else{
+                        SpaceShooterGame.playMenuHoveringBeep();
+                        changeDifficulty(xCoord < 600 ? Commands.Command.LEFT : Commands.Command.RIGHT);
+                    }
                 }
             }
         }
