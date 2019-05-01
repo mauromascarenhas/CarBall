@@ -5,6 +5,7 @@ import br.edu.ufabc.ipj.spaceshooter.core.spaceshipselection.SpaceShipSelectionA
 import br.edu.ufabc.ipj.spaceshooter.core.spaceshipselection.SpaceShipSelectionRenderer;
 import br.edu.ufabc.ipj.spaceshooter.utils.Commands;
 import br.edu.ufabc.ipj.spaceshooter.utils.ModelSelector;
+import br.edu.ufabc.ipj.spaceshooter.utils.Utilities;
 import com.badlogic.gdx.Gdx;
 import com.badlogic.gdx.audio.Music;
 
@@ -29,8 +30,6 @@ public class SpaceshipSelectionScreen extends BaseScreen{
     
     @Override
     public void update(float delta) {
-        gameAction.update(delta);
-        
         if (Commands.hasCommand(Commands.Command.SHOT)){
             ssSelectionBeep.play();
             this.setSelected(gameAction.currentSelection);
@@ -41,6 +40,19 @@ public class SpaceshipSelectionScreen extends BaseScreen{
             this.setSelected(ModelSelector.SCIFI_UNDFINED);
             this.setDone(true);
         }
+        
+        int xCoord = Utilities.toGameCoordinates(Utilities.ScreenAxis.X, Gdx.input.getX()),
+            yCoord = Utilities.toGameCoordinates(Utilities.ScreenAxis.Y, Gdx.input.getY());
+        
+        if (yCoord >= 630  && yCoord <= 730
+                        && xCoord <= 150 && xCoord >= 50 
+                        && Gdx.input.justTouched()){
+            SpaceShooterGame.playMenuSelectionBeep();
+            this.setSelected(ModelSelector.SCIFI_UNDFINED);
+            this.setDone(true);
+        }
+        
+        gameAction.update(delta);
     }
 
     @Override

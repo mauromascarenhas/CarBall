@@ -3,6 +3,7 @@ package br.edu.ufabc.ipj.spaceshooter.screen;
 import br.edu.ufabc.ipj.spaceshooter.SpaceShooterGame;
 import br.edu.ufabc.ipj.spaceshooter.utils.Commands;
 import br.edu.ufabc.ipj.spaceshooter.utils.Utilities;
+import br.edu.ufabc.ipj.spaceshooter.utils.Utilities.ScreenAxis;
 import com.badlogic.gdx.Gdx;
 import com.badlogic.gdx.graphics.GL20;
 import com.badlogic.gdx.graphics.Texture;
@@ -11,11 +12,6 @@ import com.badlogic.gdx.graphics.g2d.SpriteBatch;
 import com.badlogic.gdx.math.Matrix4;
 
 public class CreditsScreen extends BaseScreen {
-
-    private enum Coordinate{
-        X,
-        Y
-    };
     
     private float countTimer;
     private float batchOffset;
@@ -118,8 +114,8 @@ public class CreditsScreen extends BaseScreen {
         }
         else hadKeyCommand = Commands.hasCommand();
         
-        int xCoord = toGameCoordinates(Coordinate.X, Gdx.input.getX()),
-            yCoord = toGameCoordinates(Coordinate.Y, Gdx.input.getY());
+        int xCoord = Utilities.toGameCoordinates(ScreenAxis.X, Gdx.input.getX()),
+            yCoord = Utilities.toGameCoordinates(ScreenAxis.Y, Gdx.input.getY());
         
         if (batchOffset > 4120 ||
                 (yCoord >= 630  && yCoord <= 730
@@ -156,15 +152,5 @@ public class CreditsScreen extends BaseScreen {
         spriteBatch.draw(tBackBtn, 50, 630, 100.0f, 100.0f, 0, 0, 512, 512, false, false);
         
         spriteBatch.end();
-    }
-    
-    private int toGameCoordinates(Coordinate coordinate, int value){
-        int newCoord;
-        if (coordinate == Coordinate.X)
-            newCoord = (int)(value / ((float)Gdx.graphics.getWidth() / Utilities.GAME_WIDTH));
-        else 
-            newCoord = (Utilities.GAME_HEIGHT) 
-                    - (int)(value / ((float)Gdx.graphics.getHeight()/ Utilities.GAME_HEIGHT));
-        return newCoord;
     }
 }

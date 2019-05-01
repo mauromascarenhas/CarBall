@@ -100,6 +100,7 @@ public class GameAction {
         
         aExplosionEffect = SpaceShooterGame.assetManager.get("particles/asteroid_explosion", ParticleEffect.class).copy();
         sExplosionEffect = SpaceShooterGame.assetManager.get("particles/spaceship_explosion", ParticleEffect.class).copy();
+        SpaceShooterGame.particleSystem.add(sExplosionEffect);
         
         float shotReloadTmp, spacecraftSpeedTmp,
                 asteroidSpeedTmp = Asteroid.getDefaultSpeed();
@@ -217,6 +218,9 @@ public class GameAction {
         for (AbstractModel o : shots)
             o.update(delta);
         
+        if (!canShowScore && lives < 1)
+            sExplosionEffect.update(delta);
+        
         shotTimer += delta;
         asteroidTimer += delta;
         if (lives > 0) score += (delta * 100 * DIFFICULTY.getValue());
@@ -274,9 +278,6 @@ public class GameAction {
                         sExplosionEffect.init();
                         sExplosionEffect.start();
                         
-                        sExplosionEffect.update(delta);
-                        SpaceShooterGame.particleSystem.add(sExplosionEffect);
-                        
                         this.lives--;
                     }
                     else {
@@ -300,7 +301,7 @@ public class GameAction {
         }
         
         if (asteroidTimer >= ASTEROID_TSPAWN){
-            float sortedPos = (float)(Math.random() * 51.0 - 25.0) / ASTEROID_SCALE;
+            float sortedPos = (float)(Math.random() * 51.0 - 35.0) / ASTEROID_SCALE;
             
             for (int i = 0; i < DIFFICULTY.getValue(); ++i){
                 if (Math.random() < 0.5 && i != 0) continue;
@@ -325,9 +326,9 @@ public class GameAction {
         }
 
         objects.first().getGameObject().transform.getTranslation(cPos);
-        if (Commands.hasCommand(Commands.Command.LEFT) && cPos.x > -25) 
+        if (Commands.hasCommand(Commands.Command.LEFT) && cPos.x > -22) 
             objects.first().getGameObject().transform.translate(SPACECRAFT_SPEED * delta / SPACECRAFT_SCALE, 0, 0);
-        else if (Commands.hasCommand(Commands.Command.RIGHT) && cPos.x < 25) 
+        else if (Commands.hasCommand(Commands.Command.RIGHT) && cPos.x < 22) 
             objects.first().getGameObject().transform.translate(-SPACECRAFT_SPEED * delta / SPACECRAFT_SCALE, 0, 0);
         
         if (Commands.hasCommand(Commands.Command.SHOT) && canShot && lives > 0){

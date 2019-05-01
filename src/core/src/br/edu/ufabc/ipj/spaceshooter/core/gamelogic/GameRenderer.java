@@ -65,6 +65,8 @@ public class GameRenderer {
         camera.position.set(0, 15, 25);
         camera.lookAt(0, 3, 0);
         camera.update();
+        
+        SpaceShooterGame.particleBatch.setCamera(camera);
     }
     
     public void draw(float delta){
@@ -89,13 +91,13 @@ public class GameRenderer {
         for (AbstractModel o : gameAction.objects)
             if (o.getGameObject().isVisible()) modelBatch.render(o.getGameObject(), environment);
         
-        /*if (!gameAction.canShowScore && gameAction.lives < 1){
-            SpaceShooterGame.particleSystem.update(delta/20);
+        if (!gameAction.canShowScore && gameAction.lives < 1){
+            SpaceShooterGame.particleSystem.update(delta);
             SpaceShooterGame.particleSystem.begin();
             SpaceShooterGame.particleSystem.draw();
-            SpaceShooterGame.particleSystem.end();
             modelBatch.render(SpaceShooterGame.particleSystem, environment);
-        }*/
+            SpaceShooterGame.particleSystem.end();
+        }
         
         modelBatch.end();
         

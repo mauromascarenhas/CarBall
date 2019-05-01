@@ -11,27 +11,36 @@ import com.badlogic.gdx.graphics.g3d.Environment;
 import com.badlogic.gdx.graphics.g3d.ModelBatch;
 import com.badlogic.gdx.graphics.g3d.attributes.ColorAttribute;
 import com.badlogic.gdx.graphics.g3d.environment.DirectionalLight;
-import com.badlogic.gdx.graphics.g3d.utils.CameraInputController;
 import com.badlogic.gdx.math.Matrix4;
 
 public class SpaceShipSelectionRenderer {
+    private float switchTimer;
+    
     private final ModelBatch modelBatch;
     private final Environment environment;
     private final PerspectiveCamera camera;
-    private final CameraInputController input;
     private final SpaceShipSelectionAction gameAction;
     
     // Static content
     private final Texture texture;
+    private final Texture bckTexture;
+    private final Texture nxtTexture;
+    private final Texture prvTexture;
     private final Matrix4 viewMatrix;
     private final Matrix4 transMatrix;
     private final SpriteBatch spriteBatch;
     
-    public SpaceShipSelectionRenderer(SpaceShipSelectionAction action){
+    public SpaceShipSelectionRenderer(SpaceShipSelectionAction action){     
+        this.switchTimer = 0;
+        
         this.gameAction = action;
         
         //Loads static content
         texture = new Texture("static_images/space_background_dark_1.jpg");
+        bckTexture = new Texture("static_images/back_icon.png");
+        prvTexture = new Texture("static_images/left_arrow_icon.png");
+        nxtTexture = new Texture("static_images/right_arrow_icon.png");
+        
         viewMatrix = new Matrix4();
         transMatrix = new Matrix4();
         spriteBatch = new SpriteBatch();
@@ -47,9 +56,6 @@ public class SpaceShipSelectionRenderer {
         camera.position.set(0, 15, 25);
         camera.lookAt(0, 3, 0);
         camera.update();
-        
-        input = new CameraInputController(camera);
-        //Gdx.input.setInputProcessor(input);
     }
     
     public void draw(float delta){
@@ -64,6 +70,10 @@ public class SpaceShipSelectionRenderer {
         spriteBatch.begin();
         spriteBatch.draw(texture, 0, 0, Utilities.GAME_WIDTH, Utilities.GAME_HEIGHT, 0, 0,
                             2000, 1500, false, false);
+        spriteBatch.draw(prvTexture, 0, 0, Utilities.GAME_WIDTH * 0.33f, Utilities.GAME_HEIGHT,
+                0, 0, 512, 512, false, false);
+        spriteBatch.draw(nxtTexture, Utilities.GAME_WIDTH * 0.66f, 0, Utilities.GAME_WIDTH * 0.33f, Utilities.GAME_HEIGHT,
+                0, 0, 512, 512, false, false);
         spriteBatch.end();
         
         modelBatch.begin(camera);
@@ -71,6 +81,10 @@ public class SpaceShipSelectionRenderer {
             if (o.getGameObject().isVisible()) modelBatch.render(o.getGameObject(), environment);
         
         modelBatch.end();
+        
+        spriteBatch.begin();
+        spriteBatch.draw(bckTexture, 50, 630, 100.0f, 100.0f, 0, 0, 512, 512, false, false);
+        spriteBatch.end();
         
         camera.update();
     }
