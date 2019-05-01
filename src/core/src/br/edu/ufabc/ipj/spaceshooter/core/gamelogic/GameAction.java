@@ -13,6 +13,7 @@ import br.edu.ufabc.ipj.spaceshooter.model.Shot;
 import br.edu.ufabc.ipj.spaceshooter.utils.Commands;
 import br.edu.ufabc.ipj.spaceshooter.utils.DifficultySelector;
 import br.edu.ufabc.ipj.spaceshooter.utils.ModelSelector;
+import br.edu.ufabc.ipj.spaceshooter.utils.Utilities;
 import com.badlogic.gdx.Gdx;
 import com.badlogic.gdx.audio.Music;
 import com.badlogic.gdx.graphics.g3d.Material;
@@ -54,12 +55,16 @@ public class GameAction {
     
     public long score;
     
+    // Pause timer must be public
+    public float pauseTimer;
+    
     private float lostTimer;
     private float shotTimer;
     private float asteroidTimer;
     private float invulnerabilityTimer;
     
-    private boolean isFirstSong;
+    private boolean hadCommand;
+    
     // Sets it spacecraft uses missiles instead
     private boolean isInvulnerable;
     private final boolean IS_MISSILE;
@@ -74,11 +79,11 @@ public class GameAction {
     protected Array<AbstractModel> objects;
     
     protected ParticleEffect sExplosionEffect;
-    protected ParticleEffect aExplosionEffect;
     
     public GameAction(ModelSelector selected,
                         DifficultySelector difficulty){
         this.isDone = false;
+        this.hadCommand = false;
         this.canProceed = false;
         this.canShowScore = false;
         
@@ -87,6 +92,7 @@ public class GameAction {
         
         this.lostTimer = 0;
         this.shotTimer = 0;
+        this.pauseTimer = 0;
         this.asteroidTimer = 0;
         this.invulnerabilityCount = 0;
         this.invulnerabilityTimer = 0;      
@@ -98,8 +104,9 @@ public class GameAction {
         shots = new Array<AbstractModel>();
         objects = new Array<AbstractModel>();
         
-        aExplosionEffect = SpaceShooterGame.assetManager.get("particles/asteroid_explosion", ParticleEffect.class).copy();
         sExplosionEffect = SpaceShooterGame.assetManager.get("particles/spaceship_explosion", ParticleEffect.class).copy();
+        sExplosionEffect.scale(2, 4, 3);
+        
         SpaceShooterGame.particleSystem.add(sExplosionEffect);
         
         float shotReloadTmp, spacecraftSpeedTmp,
@@ -111,7 +118,7 @@ public class GameAction {
                 objects.add(new SciFiCosair());
                 objects.first().getGameObject().transform.rotate(Vector3.Y, 180);
                 spacecraftSpeedTmp = SciFiCosair.getDefaultSpeed();
-                SPACECRAFT_SCALE = SciFiCosair.DEFAULT_SCALE;
+                SPACECRAFT_SCALE = 1.0f / SciFiCosair.DEFAULT_SCALE;
                 shotReloadTmp = SciFiCosair.SHOT_RELOAD_TIME;
                 IS_MISSILE = SciFiCosair.USES_MISSILE;
                 break;
@@ -119,7 +126,7 @@ public class GameAction {
                 objects.add(new SciFiFighter());
                 objects.first().getGameObject().transform.rotate(Vector3.Y, 180);
                 spacecraftSpeedTmp = SciFiFighter.getDefaultSpeed();
-                SPACECRAFT_SCALE = SciFiFighter.DEFAULT_SCALE;
+                SPACECRAFT_SCALE = 1.0f / SciFiFighter.DEFAULT_SCALE;
                 shotReloadTmp = SciFiFighter.SHOT_RELOAD_TIME;
                 IS_MISSILE = SciFiFighter.USES_MISSILE;
                 break;
@@ -127,7 +134,7 @@ public class GameAction {
                 objects.add(new SciFiCargoSarship());
                 objects.first().getGameObject().transform.rotate(Vector3.Y, 180);
                 spacecraftSpeedTmp = SciFiCargoSarship.getDefaultSpeed();
-                SPACECRAFT_SCALE = SciFiCargoSarship.DEFAULT_SCALE;
+                SPACECRAFT_SCALE = 1.0f / SciFiCargoSarship.DEFAULT_SCALE;
                 shotReloadTmp = SciFiCargoSarship.SHOT_RELOAD_TIME;
                 IS_MISSILE = SciFiCargoSarship.USES_MISSILE;
                 break;
@@ -135,7 +142,7 @@ public class GameAction {
                 objects.add(new SciFiIntergalactic());
                 objects.first().getGameObject().transform.rotate(Vector3.Y, 180);
                 spacecraftSpeedTmp = SciFiIntergalactic.getDefaultSpeed();
-                SPACECRAFT_SCALE = SciFiIntergalactic.DEFAULT_SCALE;
+                SPACECRAFT_SCALE = 1.0f / SciFiIntergalactic.DEFAULT_SCALE;
                 shotReloadTmp = SciFiIntergalactic.SHOT_RELOAD_TIME;
                 IS_MISSILE = SciFiIntergalactic.USES_MISSILE;
                 break;
@@ -171,10 +178,10 @@ public class GameAction {
         
         shotTimer = 10.1f;
         SHOT_SPEED = Missile.getDefaultSpeed();
-        SHOT_SCALE = IS_MISSILE ? Missile.DEFAULT_SCALE : Shot.DEFAULT_SCALE;
+        SHOT_SCALE = 1.0f / (IS_MISSILE ? Missile.DEFAULT_SCALE : Shot.DEFAULT_SCALE);
         
         ASTEROID_SPEED = asteroidSpeedTmp;
-        ASTEROID_SCALE = Asteroid.DEFAULT_SCALE;
+        ASTEROID_SCALE = 1.0f / Asteroid.DEFAULT_SCALE;
         
         objects.add(new Asteroid());
         
@@ -182,7 +189,7 @@ public class GameAction {
             for (Material mat : obj.getGameObject().materials)
                 mat.remove(ColorAttribute.Emissive);
         
-        objects.get(1).getGameObject().transform.translate(0, 0, -300.0f / ASTEROID_SCALE);
+        objects.get(1).getGameObject().transform.translate(0, 0, -300.0f * ASTEROID_SCALE);
         
         firstSong = Gdx.audio.newMusic(Gdx.files.internal("songs/soundtrack/playing_song_1.wav"));
         secondSong = Gdx.audio.newMusic(Gdx.files.internal("songs/soundtrack/playing_song_2.wav"));
@@ -218,6 +225,19 @@ public class GameAction {
         for (AbstractModel o : shots)
             o.update(delta);
         
+        if (this.isPaused){
+            if (Gdx.input.justTouched() ||
+                    (Commands.hasCommand(Commands.Command.ESCAPE)
+                        && !this.hadCommand))
+                this.isPaused = false;
+            else this.hadCommand = Commands.hasCommand();
+            return;
+        }
+        else if (this.pauseTimer > 0){
+            this.pauseTimer -= delta;
+            return;
+        }
+        
         if (!canShowScore && lives < 1)
             sExplosionEffect.update(delta);
         
@@ -249,7 +269,7 @@ public class GameAction {
         Vector3 cPos = new Vector3();
         for (int i = objects.size - 1; i > 0; --i){
             GameObject current = objects.get(i).getGameObject();
-            current.transform.translate(0, 0, ASTEROID_SPEED / ASTEROID_SCALE);
+            current.transform.translate(0, 0, ASTEROID_SPEED * ASTEROID_SCALE);
             current.transform.getTranslation(cPos);
             
             if (cPos.z > 26.0){
@@ -301,7 +321,7 @@ public class GameAction {
         }
         
         if (asteroidTimer >= ASTEROID_TSPAWN){
-            float sortedPos = (float)(Math.random() * 51.0 - 35.0) / ASTEROID_SCALE;
+            float sortedPos = (float)(Math.random() * 51.0 - 35.0) * ASTEROID_SCALE;
             
             for (int i = 0; i < DIFFICULTY.getValue(); ++i){
                 if (Math.random() < 0.5 && i != 0) continue;
@@ -309,8 +329,8 @@ public class GameAction {
                 Asteroid newAsteroid = new Asteroid();
                 for (Material mat : newAsteroid.getGameObject().materials)
                     mat.remove(ColorAttribute.Emissive);
-                newAsteroid.getGameObject().transform.translate(sortedPos += (15 / ASTEROID_SCALE), 0,
-                                                                -300.0f / ASTEROID_SCALE);
+                newAsteroid.getGameObject().transform.translate(sortedPos += (15 * ASTEROID_SCALE), 0,
+                                                                -300.0f * ASTEROID_SCALE);
                 objects.add(newAsteroid);
             }
             
@@ -319,7 +339,7 @@ public class GameAction {
         
         for (int i = shots.size - 1; i > -1; --i){
             GameObject current = shots.get(i).getGameObject();
-            current.transform.translate(0, 0, - SHOT_SPEED / SHOT_SCALE);
+            current.transform.translate(0, 0, - SHOT_SPEED * SHOT_SCALE);
             current.transform.getTranslation(cPos);
             
             if (cPos.z < -300) shots.removeIndex(i);
@@ -327,9 +347,9 @@ public class GameAction {
 
         objects.first().getGameObject().transform.getTranslation(cPos);
         if (Commands.hasCommand(Commands.Command.LEFT) && cPos.x > -22) 
-            objects.first().getGameObject().transform.translate(SPACECRAFT_SPEED * delta / SPACECRAFT_SCALE, 0, 0);
+            objects.first().getGameObject().transform.translate(SPACECRAFT_SPEED * delta * SPACECRAFT_SCALE, 0, 0);
         else if (Commands.hasCommand(Commands.Command.RIGHT) && cPos.x < 22) 
-            objects.first().getGameObject().transform.translate(-SPACECRAFT_SPEED * delta / SPACECRAFT_SCALE, 0, 0);
+            objects.first().getGameObject().transform.translate(-SPACECRAFT_SPEED * delta * SPACECRAFT_SCALE, 0, 0);
         
         if (Commands.hasCommand(Commands.Command.SHOT) && canShot && lives > 0){
             Vector3 spaceCraftPos = new Vector3();
@@ -341,13 +361,35 @@ public class GameAction {
             AbstractModel newShot = IS_MISSILE ? new Missile() : new Shot();
             for (Material mat : newShot.getGameObject().materials)
                     mat.remove(ColorAttribute.Emissive);
-            newShot.getGameObject().transform.translate(spaceCraftPos.x / SHOT_SCALE, 0, 0);
+            newShot.getGameObject().transform.translate(spaceCraftPos.x * SHOT_SCALE, 0, 0);
             shots.add(newShot);
             shotTimer = 0;
         }
         
+        if (Commands.hasCommand(Commands.Command.ESCAPE)){
+            this.isPaused = true;
+            this.hadCommand = true;
+            
+            this.pauseTimer = 4;
+        }
+        
+        if (Gdx.input.justTouched()){
+            int xCoord = Utilities.toGameCoordinates(Utilities.ScreenAxis.X, Gdx.input.getX()),
+                yCoord = Utilities.toGameCoordinates(Utilities.ScreenAxis.Y, Gdx.input.getY());
+            
+            if (xCoord >= 1210 && xCoord <= 1310
+                    && yCoord >= 630 && yCoord <= 730){
+                this.isPaused = true;
+                this.hadCommand = true;
+
+                this.pauseTimer = 4;
+            }
+        }
+        
         if (this.canProceed && 
-                (Commands.hasCommand(Commands.Command.SHOT) || Gdx.input.justTouched()))
+                (Commands.hasCommand(Commands.Command.SHOT) || Gdx.input.justTouched())){
+            SpaceShooterGame.particleSystem.remove(sExplosionEffect);
             this.isDone = true;
+        }
     }
 }

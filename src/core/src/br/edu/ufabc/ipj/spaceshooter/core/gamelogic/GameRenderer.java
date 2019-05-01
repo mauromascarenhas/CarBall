@@ -30,6 +30,7 @@ public class GameRenderer {
     private final Texture life_symb;
     private final Texture shot_symb;
     private final Texture black_ovl;
+    private final Texture pause_symb;
     private final Matrix4 viewMatrix;
     private final Matrix4 transMatrix;
     private final BitmapFont bitmapFont;
@@ -46,6 +47,7 @@ public class GameRenderer {
         shot_symb = new Texture("static_images/target_icon.png");
         black_ovl = new Texture("static_images/black_overlay.jpg");
         life_symb = new Texture("static_images/spacecraft_icon.png");
+        pause_symb = new Texture("static_images/pause_icon.png");
         
         bitmapFont = new BitmapFont(Gdx.files.internal("fonts/space_age/big/space_age.fnt"));
         bitmapTitleFont = new BitmapFont(Gdx.files.internal("fonts/space_age/big_bold/space_age.fnt"));
@@ -71,7 +73,7 @@ public class GameRenderer {
     
     public void draw(float delta){
         Gdx.gl.glViewport(0, 0, Gdx.graphics.getWidth(), Gdx.graphics.getHeight());
-        Gdx.gl.glClearColor(0, 0, 0, 0);
+        Gdx.gl.glClearColor(0f, 0f, 0f, 1.0f);
 	Gdx.gl.glClear(GL20.GL_COLOR_BUFFER_BIT | GL20.GL_DEPTH_BUFFER_BIT);		
         
         viewMatrix.setToOrtho2D(0, 0, Utilities.GAME_WIDTH, Utilities.GAME_HEIGHT);
@@ -95,12 +97,10 @@ public class GameRenderer {
             SpaceShooterGame.particleSystem.update(delta);
             SpaceShooterGame.particleSystem.begin();
             SpaceShooterGame.particleSystem.draw();
-            modelBatch.render(SpaceShooterGame.particleSystem, environment);
             SpaceShooterGame.particleSystem.end();
-        }
-        
+            modelBatch.render(SpaceShooterGame.particleSystem, environment);
+        }        
         modelBatch.end();
-        
         
         // HUD drawing
         spriteBatch.begin();
@@ -111,8 +111,14 @@ public class GameRenderer {
             spriteBatch.draw(life_symb, (40 + i * 52f), 40, 50.0f, 50.0f, 0, 0, 512, 512, false, false);
             
         bitmapFont.getData().setScale(1);
-        if (gameAction.lives > 0)
+        if (gameAction.lives > 0 && !gameAction.isPaused
+                && gameAction.pauseTimer <= 0){
+            overlay_alpha = 0;
+            
+            spriteBatch.draw(pause_symb, 1210, 630, 100.0f, 100.0f, 0, 0, 512, 512, false, false);
+            
             bitmapFont.draw(spriteBatch, String.format("SCORE : %d", gameAction.score), 50.0f, 650.0f);
+        }
         else {
             if (overlay_alpha < 0.7f) overlay_alpha += (0.3f * delta);
             spriteBatch.enableBlending();
@@ -131,6 +137,16 @@ public class GameRenderer {
                                                                 150, 300);
 
                 bitmapFont.draw(spriteBatch, String.format("%019d", gameAction.score), 170, 500);
+            }
+            else if (gameAction.isPaused){
+                bitmapTitleFont.getData().setScale(1, 1.5f);
+                bitmapTitleFont.draw(spriteBatch, "GAME PAUSED...", 375, 400);
+            }
+            else if (gameAction.pauseTimer > 0){
+                bitmapTitleFont.getData().setScale(1, 1.5f);
+                bitmapTitleFont.draw(spriteBatch, "RESTARTING...", 380, 450);
+                bitmapTitleFont.draw(spriteBatch, String.format("%02d", (int)gameAction.pauseTimer),
+                                                                610, 380);
             }
             
             if (gameAction.canProceed)

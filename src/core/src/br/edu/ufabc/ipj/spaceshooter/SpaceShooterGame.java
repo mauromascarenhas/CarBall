@@ -24,7 +24,6 @@ import com.badlogic.gdx.graphics.g3d.particles.ParticleEffectLoader;
 import com.badlogic.gdx.graphics.g3d.particles.ParticleSystem;
 import com.badlogic.gdx.graphics.g3d.particles.batches.BillboardParticleBatch;
 
-
 public class SpaceShooterGame extends Game implements InputProcessor {
     
     public static long highestScore = 0;
@@ -78,7 +77,6 @@ public class SpaceShooterGame extends Game implements InputProcessor {
         ParticleEffectLoader loader = new ParticleEffectLoader(new InternalFileHandleResolver());
         
         assetManager.setLoader(ParticleEffect.class, loader);
-        assetManager.load("particles/asteroid_explosion", ParticleEffect.class, loadParameter);
         assetManager.load("particles/spaceship_explosion", ParticleEffect.class, loadParameter);
         
         particleSystem.add(particleBatch);

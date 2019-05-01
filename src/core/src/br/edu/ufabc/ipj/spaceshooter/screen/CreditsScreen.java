@@ -84,7 +84,7 @@ public class CreditsScreen extends BaseScreen {
                         + "      ~ Justin Callaghan\n"
                         + "        (Personal use)";
         
-        texture = new Texture("static_images/space_background_dark_1.jpg");
+        texture = new Texture("static_images/space_background_dark_3.png");
         tBackBtn = new Texture("static_images/back_icon.png");
         
         viewMatrix = new Matrix4();
@@ -142,7 +142,7 @@ public class CreditsScreen extends BaseScreen {
         
         spriteBatch.begin();
         spriteBatch.draw(texture, 0, 0, Utilities.GAME_WIDTH, Utilities.GAME_HEIGHT, 0, 0,
-                            2000, 1500, false, false);
+                            1920, 1080, false, false);
         
         bitmapTitleFont.getData().setScale(1.25f);
         bitmapTitleFont.draw(spriteBatch, gameTitle, 450, 620 + batchOffset);

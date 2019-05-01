@@ -53,7 +53,7 @@ public class SpaceShipSelectionRenderer {
         
         camera = new PerspectiveCamera(67.0f, Gdx.graphics.getWidth(), Gdx.graphics.getHeight());
         camera.far = 300.0f;
-        camera.position.set(0, 15, 25);
+        camera.position.set(0, 18, 25);
         camera.lookAt(0, 3, 0);
         camera.update();
     }

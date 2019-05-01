@@ -9,7 +9,7 @@ import com.badlogic.gdx.math.Vector3;
 
 public class SciFiFighter extends AbstractModel{
     
-    public static float DEFAULT_SCALE = 1;
+    public static float DEFAULT_SCALE = 0.9f;
     public static float SHOT_RELOAD_TIME = 1.5f;
     
     public static boolean USES_MISSILE = true;
@@ -25,6 +25,8 @@ public class SciFiFighter extends AbstractModel{
         
         Model mIdle = SpaceShooterGame.assetManager.get("three_dimensional/scifi_spacecraft/SciFi_Fighter.g3db");
         object = new GameObject(mIdle, visible);
+        object.transform.scale(DEFAULT_SCALE, DEFAULT_SCALE, DEFAULT_SCALE);
+        object.updateBoxScale(DEFAULT_SCALE);
         
         for (Material m : object.materials)
             m.remove(ColorAttribute.Emissive);
