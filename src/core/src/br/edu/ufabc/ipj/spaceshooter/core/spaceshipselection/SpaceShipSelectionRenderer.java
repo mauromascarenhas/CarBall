@@ -61,7 +61,9 @@ public class SpaceShipSelectionRenderer {
     public void draw(float delta){
         Gdx.gl.glViewport(0, 0, Gdx.graphics.getWidth(), Gdx.graphics.getHeight());
         Gdx.gl.glClearColor(0, 0, 0, 0);
-	Gdx.gl.glClear(GL20.GL_COLOR_BUFFER_BIT | GL20.GL_DEPTH_BUFFER_BIT);		
+	Gdx.gl.glClear(GL20.GL_COLOR_BUFFER_BIT | GL20.GL_DEPTH_BUFFER_BIT);	
+        
+        switchTimer += delta;
         
         viewMatrix.setToOrtho2D(0, 0, Utilities.GAME_WIDTH, Utilities.GAME_HEIGHT);
         spriteBatch.setProjectionMatrix(viewMatrix);
@@ -70,10 +72,23 @@ public class SpaceShipSelectionRenderer {
         spriteBatch.begin();
         spriteBatch.draw(texture, 0, 0, Utilities.GAME_WIDTH, Utilities.GAME_HEIGHT, 0, 0,
                             2000, 1500, false, false);
-        spriteBatch.draw(prvTexture, 0, 0, Utilities.GAME_WIDTH * 0.33f, Utilities.GAME_HEIGHT,
-                0, 0, 512, 512, false, false);
-        spriteBatch.draw(nxtTexture, Utilities.GAME_WIDTH * 0.66f, 0, Utilities.GAME_WIDTH * 0.33f, Utilities.GAME_HEIGHT,
-                0, 0, 512, 512, false, false);
+        if (switchTimer <= 0.5){
+            spriteBatch.draw(prvTexture, 10, Utilities.GAME_HEIGHT * 0.1f,
+                    Utilities.GAME_WIDTH * 0.30f, Utilities.GAME_HEIGHT * 0.8f,
+                    0, 0, 512, 512, false, false);
+            spriteBatch.draw(nxtTexture, Utilities.GAME_WIDTH * 0.7f, Utilities.GAME_HEIGHT * 0.1f,
+                    Utilities.GAME_WIDTH * 0.30f, Utilities.GAME_HEIGHT * 0.8f,
+                    0, 0, 512, 512, false, false);
+        }
+        else {
+            spriteBatch.draw(prvTexture, 0, Utilities.GAME_HEIGHT * 0.1f,
+                    Utilities.GAME_WIDTH * 0.30f, Utilities.GAME_HEIGHT * 0.8f,
+                    0, 0, 512, 512, false, false);
+            spriteBatch.draw(nxtTexture, 10 + Utilities.GAME_WIDTH * 0.7f, Utilities.GAME_HEIGHT * 0.1f,
+                    Utilities.GAME_WIDTH * 0.30f, Utilities.GAME_HEIGHT * 0.8f,
+                    0, 0, 512, 512, false, false);
+            if (switchTimer > 1) switchTimer = 0;
+        }
         spriteBatch.end();
         
         modelBatch.begin(camera);

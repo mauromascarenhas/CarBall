@@ -41,15 +41,22 @@ public class SpaceshipSelectionScreen extends BaseScreen{
             this.setDone(true);
         }
         
-        int xCoord = Utilities.toGameCoordinates(Utilities.ScreenAxis.X, Gdx.input.getX()),
-            yCoord = Utilities.toGameCoordinates(Utilities.ScreenAxis.Y, Gdx.input.getY());
+        if (Gdx.input.justTouched()){
+            int xCoord = Utilities.toGameCoordinates(Utilities.ScreenAxis.X, Gdx.input.getX()),
+                yCoord = Utilities.toGameCoordinates(Utilities.ScreenAxis.Y, Gdx.input.getY());
         
-        if (yCoord >= 630  && yCoord <= 730
-                        && xCoord <= 150 && xCoord >= 50 
-                        && Gdx.input.justTouched()){
-            SpaceShooterGame.playMenuSelectionBeep();
-            this.setSelected(ModelSelector.SCIFI_UNDFINED);
-            this.setDone(true);
+            if (yCoord >= 630  && yCoord <= 730
+                            && xCoord <= 150 && xCoord >= 50){
+                SpaceShooterGame.playMenuSelectionBeep();
+                this.setSelected(ModelSelector.SCIFI_UNDFINED);
+                this.setDone(true);
+            }
+            else if (xCoord >= Utilities.GAME_WIDTH * 0.3f
+                    && xCoord <= Utilities.GAME_WIDTH * 0.7f){
+                ssSelectionBeep.play();
+                this.setSelected(gameAction.currentSelection);
+                this.setDone(true);            
+            }
         }
         
         gameAction.update(delta);

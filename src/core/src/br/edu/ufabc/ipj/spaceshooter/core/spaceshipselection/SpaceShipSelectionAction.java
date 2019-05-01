@@ -9,6 +9,8 @@ import br.edu.ufabc.ipj.spaceshooter.model.SciFiFighter;
 import br.edu.ufabc.ipj.spaceshooter.model.SciFiIntergalactic;
 import br.edu.ufabc.ipj.spaceshooter.utils.Commands;
 import br.edu.ufabc.ipj.spaceshooter.utils.ModelSelector;
+import br.edu.ufabc.ipj.spaceshooter.utils.Utilities;
+import com.badlogic.gdx.Gdx;
 import com.badlogic.gdx.graphics.g3d.Material;
 import com.badlogic.gdx.graphics.g3d.attributes.ColorAttribute;
 import com.badlogic.gdx.utils.Array;
@@ -47,11 +49,21 @@ public class SpaceShipSelectionAction {
         for (AbstractModel o : objects)
             o.update(delta);
         
+        // Giver preference to keyboard instead of mouse or touch
         if (!hadCommand && Commands.set[Commands.Command.LEFT.getValue()])
             swapSpaceship(Commands.Command.LEFT);
         else if (!hadCommand && Commands.set[Commands.Command.RIGHT.getValue()])
             swapSpaceship(Commands.Command.RIGHT);
         else hadCommand = Commands.hasCommand();
+        
+        if (Gdx.input.justTouched()){
+            int xCoord = Utilities.toGameCoordinates(Utilities.ScreenAxis.X, Gdx.input.getX());
+
+            if (xCoord < Utilities.GAME_WIDTH * 0.3f)
+                swapSpaceship(Commands.Command.LEFT);
+            else if (xCoord > Utilities.GAME_WIDTH * 0.7f)
+                swapSpaceship(Commands.Command.RIGHT);
+        }
         
         for (AbstractModel o : objects)
             if (o instanceof SciFiFighter)

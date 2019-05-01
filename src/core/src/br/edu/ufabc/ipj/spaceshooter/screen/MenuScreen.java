@@ -83,7 +83,8 @@ public class MenuScreen extends BaseScreen {
             }
             else if (Commands.hasCommand(Commands.Command.SHOT)){
                 SpaceShooterGame.playMenuSelectionBeep();
-                setDone(true);
+                if (hoveredItem == MenuItem.QUIT) System.exit(0);
+                else setDone(true);
             }
             else if (hoveredItem == MenuItem.PLAY){
                 if (Commands.hasCommand(Commands.Command.LEFT)){
