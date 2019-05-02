@@ -351,38 +351,38 @@ public class GameAction {
         else if (Commands.hasCommand(Commands.Command.RIGHT) && cPos.x < 22) 
             objects.first().getGameObject().transform.translate(-SPACECRAFT_SPEED * delta * SPACECRAFT_SCALE, 0, 0);
         
-        if (Commands.hasCommand(Commands.Command.SHOT) && canShot && lives > 0){
-            Vector3 spaceCraftPos = new Vector3();
-            objects.first().getGameObject().transform.getTranslation(spaceCraftPos);
-            
-            shootingSong.stop();
-            shootingSong.play();
-            
-            AbstractModel newShot = IS_MISSILE ? new Missile() : new Shot();
-            for (Material mat : newShot.getGameObject().materials)
-                    mat.remove(ColorAttribute.Emissive);
-            newShot.getGameObject().transform.translate(spaceCraftPos.x * SHOT_SCALE, 0, 0);
-            shots.add(newShot);
-            shotTimer = 0;
-        }
+        if (Commands.hasCommand(Commands.Command.SHOT) && canShot && lives > 0)
+            shotNewMissile();
         
         if (Commands.hasCommand(Commands.Command.ESCAPE)){
             this.isPaused = true;
             this.hadCommand = true;
             
-            this.pauseTimer = 4;
+            this.pauseTimer = 3;
         }
         
-        if (Gdx.input.justTouched()){
+        if (Gdx.input.isTouched() || Gdx.input.justTouched()){
             int xCoord = Utilities.toGameCoordinates(Utilities.ScreenAxis.X, Gdx.input.getX()),
                 yCoord = Utilities.toGameCoordinates(Utilities.ScreenAxis.Y, Gdx.input.getY());
             
             if (xCoord >= 1210 && xCoord <= 1310
-                    && yCoord >= 630 && yCoord <= 730){
+                    && yCoord >= 630 && yCoord <= 730
+                    && Gdx.input.justTouched()){
                 this.isPaused = true;
                 this.hadCommand = true;
 
-                this.pauseTimer = 4;
+                this.pauseTimer = 3;
+            }
+            
+            if (!Commands.hasCommand()){
+                objects.first().getGameObject().transform.getTranslation(cPos);
+                if (xCoord < Utilities.GAME_WIDTH * 0.3f && cPos.x > -22) 
+                    objects.first().getGameObject().transform.translate(SPACECRAFT_SPEED * delta * SPACECRAFT_SCALE, 0, 0);
+                else if (xCoord > Utilities.GAME_WIDTH * 0.7f && cPos.x < 22) 
+                    objects.first().getGameObject().transform.translate(-SPACECRAFT_SPEED * delta * SPACECRAFT_SCALE, 0, 0);
+                else if (canShot && lives > 0 && xCoord >= Utilities.GAME_WIDTH * 0.3f
+                        && xCoord <= Utilities.GAME_WIDTH * 0.7f)
+                    shotNewMissile();
             }
         }
         
@@ -391,5 +391,20 @@ public class GameAction {
             SpaceShooterGame.particleSystem.remove(sExplosionEffect);
             this.isDone = true;
         }
+    }
+    
+    private void shotNewMissile(){
+        Vector3 spaceCraftPos = new Vector3();
+        objects.first().getGameObject().transform.getTranslation(spaceCraftPos);
+           
+        shootingSong.stop();
+        shootingSong.play();
+            
+        AbstractModel newShot = IS_MISSILE ? new Missile() : new Shot();
+        for (Material mat : newShot.getGameObject().materials)
+                mat.remove(ColorAttribute.Emissive);
+        newShot.getGameObject().transform.translate(spaceCraftPos.x * SHOT_SCALE, 0, 0);
+        shots.add(newShot);
+        shotTimer = 0;
     }
 }

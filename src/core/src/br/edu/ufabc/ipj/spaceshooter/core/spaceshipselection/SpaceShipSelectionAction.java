@@ -24,7 +24,7 @@ public class SpaceShipSelectionAction {
     protected Array<AbstractModel> objects;
     
     public SpaceShipSelectionAction(){
-        hadCommand = false;
+        hadCommand = Commands.hasCommand();
         
         currentSelection = ModelSelector.SCIFI_FIGHTER;
         
