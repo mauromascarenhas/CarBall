@@ -112,18 +112,24 @@ public class SpaceShipSelectionRenderer {
                         (Utilities.GAME_WIDTH - 512) * 0.5f, (Utilities.GAME_HEIGHT - 512) * 0.5f,
                         512, 512, 0, 0, 512, 512, false, false);
             spriteBatch.setColor(1.0f, 1.0f, 1.0f, 1.0f);
+            
+            bitmapFont.getData().setScale(0.8f);
+            bitmapFont.draw(spriteBatch, String.format("COST : %1$d <PTS>",
+                                (gameAction.currentSelection.getValue() - 1) * Utilities.SPACESHIP_MULT),
+                                380, 710);
         }
-        bitmapFont.getData().setScale(0.5f);
-        bitmapFont.draw(spriteBatch, String.format("SPEED : %1$04.1f / %2$02.1f <u/s>",
-                            Math.abs(gameAction.currentSpeed), gameAction.maxSpeed),
-                            420, 740);
-        bitmapFont.draw(spriteBatch, String.format("COOLDOWN : %1$s / %2$02.1f <s>",
-                            gameAction.currentReload, gameAction.maxReload),
-                            420, 710);
-        bitmapFont.draw(spriteBatch, String.format("WEAPON : %1$s", gameAction.isMissile ? "MISSILE" : "SCIFI SPHERE"),
-                            420, 680);
+        else {
+            bitmapFont.getData().setScale(0.5f);
+            bitmapFont.draw(spriteBatch, String.format("SPEED : %1$04.1f / %2$02.1f <u/s>",
+                                Math.abs(gameAction.currentSpeed), gameAction.maxSpeed),
+                                420, 740);
+            bitmapFont.draw(spriteBatch, String.format("COOLDOWN : %1$s / %2$02.1f <s>",
+                                gameAction.currentReload, gameAction.maxReload),
+                                420, 710);
+            bitmapFont.draw(spriteBatch, String.format("WEAPON : %1$s", gameAction.isMissile ? "MISSILE" : "SCIFI SPHERE"),
+                                420, 680);
+        }
         spriteBatch.end();
-        
         camera.update();
     }
 }
