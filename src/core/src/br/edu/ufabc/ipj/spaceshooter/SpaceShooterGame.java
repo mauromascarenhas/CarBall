@@ -39,8 +39,9 @@ public class SpaceShooterGame extends Game implements InputProcessor {
     public static ParticleSystem particleSystem;
     public static BillboardParticleBatch particleBatch;
     
+    public static DifficultySelector selectedDifficulty;
+    
     private BaseScreen currentScreen;
-    private DifficultySelector selectedDifficulty;
 
     @Override
     public void create() {

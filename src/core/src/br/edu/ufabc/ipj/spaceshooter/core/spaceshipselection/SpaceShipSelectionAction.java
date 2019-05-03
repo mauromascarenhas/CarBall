@@ -21,6 +21,9 @@ public class SpaceShipSelectionAction {
     public float currentReload;
     public boolean isMissile;
     
+    public float maxSpeed;
+    public float maxReload;
+    
     public ModelSelector currentSelection;
     
     private boolean hadCommand;
@@ -31,6 +34,8 @@ public class SpaceShipSelectionAction {
         this.currentSpeed = SciFiFighter.getDefaultSpeed();
         this.currentReload = SciFiFighter.SHOT_RELOAD_TIME;
         this.isMissile = SciFiFighter.USES_MISSILE;
+        
+        adjustSpacecraftAttributes();
         
         this.hadCommand = Commands.hasCommand();
         
@@ -118,6 +123,29 @@ public class SpaceShipSelectionAction {
                 this.currentSpeed = SciFiIntergalactic.getDefaultSpeed();
                 this.currentReload = SciFiIntergalactic.SHOT_RELOAD_TIME;
                 this.isMissile = SciFiIntergalactic.USES_MISSILE;
+        }
+        
+        adjustSpacecraftAttributes();
+    }
+    
+    private void adjustSpacecraftAttributes(){
+        switch(SpaceShooterGame.selectedDifficulty){
+            case HARD:
+                currentReload *= 3.0f;
+                currentSpeed *= 5.0f;
+                maxReload = 2 * 3.0f;
+                maxSpeed = 15 * 5.0f;
+                break;
+            case MEDIUM:
+                currentReload *= 1.5f;
+                currentSpeed *= 3.0f;
+                maxReload = 2 * 1.5f;
+                maxSpeed = 15 * 3.0f;
+                break;
+            case EASY:
+            default:
+                maxReload = 2.0f;
+                maxSpeed = 15.0f;
         }
     }
 }

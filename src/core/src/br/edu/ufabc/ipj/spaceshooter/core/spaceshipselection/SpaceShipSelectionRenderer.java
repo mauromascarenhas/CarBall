@@ -114,9 +114,11 @@ public class SpaceShipSelectionRenderer {
             spriteBatch.setColor(1.0f, 1.0f, 1.0f, 1.0f);
         }
         bitmapFont.getData().setScale(0.5f);
-        bitmapFont.draw(spriteBatch, String.format("SPEED : %1$02.01f / 15 <u/s>", Math.abs(gameAction.currentSpeed)),
+        bitmapFont.draw(spriteBatch, String.format("SPEED : %1$04.1f / %2$02.1f <u/s>",
+                            Math.abs(gameAction.currentSpeed), gameAction.maxSpeed),
                             420, 740);
-        bitmapFont.draw(spriteBatch, String.format("RELOAD SPEED : %1$s / 2 <s>", gameAction.currentReload),
+        bitmapFont.draw(spriteBatch, String.format("COOLDOWN : %1$s / %2$02.1f <s>",
+                            gameAction.currentReload, gameAction.maxReload),
                             420, 710);
         bitmapFont.draw(spriteBatch, String.format("WEAPON : %1$s", gameAction.isMissile ? "MISSILE" : "SCIFI SPHERE"),
                             420, 680);

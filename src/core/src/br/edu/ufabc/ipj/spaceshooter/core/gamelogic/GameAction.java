@@ -354,7 +354,7 @@ public class GameAction {
         if (Commands.hasCommand(Commands.Command.SHOT) && canShot && lives > 0)
             shotNewMissile();
         
-        if (Commands.hasCommand(Commands.Command.ESCAPE)){
+        if (Commands.hasCommand(Commands.Command.ESCAPE) && lives > 0){
             this.isPaused = true;
             this.hadCommand = true;
             
@@ -367,7 +367,8 @@ public class GameAction {
             
             if (xCoord >= 1210 && xCoord <= 1310
                     && yCoord >= 630 && yCoord <= 730
-                    && Gdx.input.justTouched()){
+                    && Gdx.input.justTouched()
+                    && lives > 0){
                 this.isPaused = true;
                 this.hadCommand = true;
 
