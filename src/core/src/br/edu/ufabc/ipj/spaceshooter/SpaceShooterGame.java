@@ -16,6 +16,7 @@ import br.edu.ufabc.ipj.spaceshooter.utils.DifficultySelector;
 import br.edu.ufabc.ipj.spaceshooter.utils.MenuItem;
 import br.edu.ufabc.ipj.spaceshooter.utils.ModelSelector;
 import com.badlogic.gdx.Input;
+import com.badlogic.gdx.Preferences;
 import com.badlogic.gdx.assets.loaders.resolvers.InternalFileHandleResolver;
 import com.badlogic.gdx.audio.Music;
 import com.badlogic.gdx.graphics.g3d.Model;
@@ -26,12 +27,13 @@ import com.badlogic.gdx.graphics.g3d.particles.batches.BillboardParticleBatch;
 
 public class SpaceShooterGame extends Game implements InputProcessor {
     
-    public static long highestScore = 0;
+    public static long highestScore;
 
     public static Music backgroundSong;
     public static Music menuHoveringBeep;
     public static Music menuSelectionBeep;
     
+    public static Preferences gamePrefs;
     public static AssetManager assetManager;
     public static ModelBuilder modelBuider;
     public static ParticleSystem particleSystem;
@@ -43,6 +45,9 @@ public class SpaceShooterGame extends Game implements InputProcessor {
     @Override
     public void create() {
         selectedDifficulty = DifficultySelector.EASY;
+        
+        gamePrefs = Gdx.app.getPreferences("spaceshooter_game_settings");
+        highestScore = gamePrefs.getLong("highest_score", 0);
         
         modelBuider = new ModelBuilder();
         assetManager = new AssetManager();
@@ -119,6 +124,12 @@ public class SpaceShooterGame extends Game implements InputProcessor {
     public static void playMenuSelectionBeep(){
         if (menuSelectionBeep.isPlaying()) menuSelectionBeep.stop();
         menuSelectionBeep.play();
+    }
+    
+    public static void setNewHighScore(long newHighScore){
+        highestScore = newHighScore;
+        gamePrefs.putLong("highest_score", highestScore);
+        gamePrefs.flush();
     }
 
     /*

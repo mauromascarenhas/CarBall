@@ -11,6 +11,8 @@ public class Utilities {
     
     public static final int GAME_WIDTH  = 1366;
     public static final int GAME_HEIGHT = 768;
+    
+    public static final int SPACESHIP_MULT = 6000;
 	
     public static Vector3 convertCoordinates(float x, float y) {
 	Vector3 pos = new Vector3();

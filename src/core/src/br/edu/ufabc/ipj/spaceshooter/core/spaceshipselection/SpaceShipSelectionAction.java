@@ -17,6 +17,10 @@ import com.badlogic.gdx.utils.Array;
 
 public class SpaceShipSelectionAction {
     
+    public float currentSpeed;
+    public float currentReload;
+    public boolean isMissile;
+    
     public ModelSelector currentSelection;
     
     private boolean hadCommand;
@@ -24,9 +28,13 @@ public class SpaceShipSelectionAction {
     protected Array<AbstractModel> objects;
     
     public SpaceShipSelectionAction(){
-        hadCommand = Commands.hasCommand();
+        this.currentSpeed = SciFiFighter.getDefaultSpeed();
+        this.currentReload = SciFiFighter.SHOT_RELOAD_TIME;
+        this.isMissile = SciFiFighter.USES_MISSILE;
         
-        currentSelection = ModelSelector.SCIFI_FIGHTER;
+        this.hadCommand = Commands.hasCommand();
+        
+        this.currentSelection = ModelSelector.SCIFI_FIGHTER;
         
         objects = new Array<AbstractModel>();
         
@@ -89,5 +97,27 @@ public class SpaceShipSelectionAction {
         if (command == Commands.Command.RIGHT) currentSelection = ModelSelector.fromInteger(++i >= objects.size ? 1 : i);
         else currentSelection = ModelSelector.fromInteger(--i == 0 ? objects.size - 1 : i);
         objects.get(currentSelection.getValue()).getGameObject().setVisible(true);
+        
+        switch(currentSelection){
+            case SCIFI_FIGHTER:
+                this.currentSpeed = SciFiFighter.getDefaultSpeed();
+                this.currentReload = SciFiFighter.SHOT_RELOAD_TIME;
+                this.isMissile = SciFiFighter.USES_MISSILE;
+                break;
+            case SCIFI_COSAIR:
+                this.currentSpeed = SciFiCosair.getDefaultSpeed();
+                this.currentReload = SciFiCosair.SHOT_RELOAD_TIME;
+                this.isMissile = SciFiCosair.USES_MISSILE;
+                break;
+            case SCIFI_STARSHIP:
+                this.currentSpeed = SciFiCargoSarship.getDefaultSpeed();
+                this.currentReload = SciFiCargoSarship.SHOT_RELOAD_TIME;
+                this.isMissile = SciFiCargoSarship.USES_MISSILE;
+                break;
+            case SCIFI_INTERGALACTIC:
+                this.currentSpeed = SciFiIntergalactic.getDefaultSpeed();
+                this.currentReload = SciFiIntergalactic.SHOT_RELOAD_TIME;
+                this.isMissile = SciFiIntergalactic.USES_MISSILE;
+        }
     }
 }

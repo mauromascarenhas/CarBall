@@ -9,7 +9,7 @@ import com.badlogic.gdx.math.Vector3;
 
 public class SciFiCosair extends AbstractModel{
         
-    public static final float DEFAULT_SCALE = 0.006f;
+    public static final float DEFAULT_SCALE = 0.005f;
     public static final float SHOT_RELOAD_TIME = 1.5f;
     
     public static boolean USES_MISSILE = false;

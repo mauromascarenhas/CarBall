@@ -1,11 +1,13 @@
 package br.edu.ufabc.ipj.spaceshooter.core.spaceshipselection;
 
+import br.edu.ufabc.ipj.spaceshooter.SpaceShooterGame;
 import br.edu.ufabc.ipj.spaceshooter.model.AbstractModel;
 import br.edu.ufabc.ipj.spaceshooter.utils.Utilities;
 import com.badlogic.gdx.Gdx;
 import com.badlogic.gdx.graphics.GL20;
 import com.badlogic.gdx.graphics.PerspectiveCamera;
 import com.badlogic.gdx.graphics.Texture;
+import com.badlogic.gdx.graphics.g2d.BitmapFont;
 import com.badlogic.gdx.graphics.g2d.SpriteBatch;
 import com.badlogic.gdx.graphics.g3d.Environment;
 import com.badlogic.gdx.graphics.g3d.ModelBatch;
@@ -23,11 +25,13 @@ public class SpaceShipSelectionRenderer {
     
     // Static content
     private final Texture texture;
+    private final Texture lckTexture;
     private final Texture bckTexture;
     private final Texture nxtTexture;
     private final Texture prvTexture;
     private final Matrix4 viewMatrix;
     private final Matrix4 transMatrix;
+    private final BitmapFont bitmapFont;
     private final SpriteBatch spriteBatch;
     
     public SpaceShipSelectionRenderer(SpaceShipSelectionAction action){     
@@ -36,10 +40,13 @@ public class SpaceShipSelectionRenderer {
         this.gameAction = action;
         
         //Loads static content
-        texture = new Texture("static_images/space_background_dark_1.jpg");
+        texture = new Texture("static_images/space_background_dark_3.png");
         bckTexture = new Texture("static_images/back_icon.png");
+        lckTexture = new Texture("static_images/padlock_icon.png");
         prvTexture = new Texture("static_images/left_arrow_icon.png");
         nxtTexture = new Texture("static_images/right_arrow_icon.png");
+        
+        bitmapFont = new BitmapFont(Gdx.files.internal("fonts/space_age/big/space_age.fnt"));
         
         viewMatrix = new Matrix4();
         transMatrix = new Matrix4();
@@ -71,7 +78,7 @@ public class SpaceShipSelectionRenderer {
         
         spriteBatch.begin();
         spriteBatch.draw(texture, 0, 0, Utilities.GAME_WIDTH, Utilities.GAME_HEIGHT, 0, 0,
-                            2000, 1500, false, false);
+                            1920, 1080, false, false);
         if (switchTimer <= 0.5){
             spriteBatch.draw(prvTexture, 10, Utilities.GAME_HEIGHT * 0.1f,
                     Utilities.GAME_WIDTH * 0.30f, Utilities.GAME_HEIGHT * 0.8f,
@@ -99,6 +106,20 @@ public class SpaceShipSelectionRenderer {
         
         spriteBatch.begin();
         spriteBatch.draw(bckTexture, 50, 630, 100.0f, 100.0f, 0, 0, 512, 512, false, false);
+        if ((gameAction.currentSelection.getValue() - 1) * Utilities.SPACESHIP_MULT > SpaceShooterGame.highestScore){
+            spriteBatch.setColor(1.0f, 1.0f, 1.0f, 0.3f);
+            spriteBatch.draw(lckTexture,
+                        (Utilities.GAME_WIDTH - 512) * 0.5f, (Utilities.GAME_HEIGHT - 512) * 0.5f,
+                        512, 512, 0, 0, 512, 512, false, false);
+            spriteBatch.setColor(1.0f, 1.0f, 1.0f, 1.0f);
+        }
+        bitmapFont.getData().setScale(0.5f);
+        bitmapFont.draw(spriteBatch, String.format("SPEED : %1$02.01f / 15 <u/s>", Math.abs(gameAction.currentSpeed)),
+                            420, 740);
+        bitmapFont.draw(spriteBatch, String.format("RELOAD SPEED : %1$s / 2 <s>", gameAction.currentReload),
+                            420, 710);
+        bitmapFont.draw(spriteBatch, String.format("WEAPON : %1$s", gameAction.isMissile ? "MISSILE" : "SCIFI SPHERE"),
+                            420, 680);
         spriteBatch.end();
         
         camera.update();

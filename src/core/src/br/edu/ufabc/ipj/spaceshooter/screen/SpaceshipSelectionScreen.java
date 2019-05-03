@@ -31,14 +31,20 @@ public class SpaceshipSelectionScreen extends BaseScreen{
     @Override
     public void update(float delta) {
         if (Commands.hasCommand(Commands.Command.SHOT)){
-            ssSelectionBeep.play();
-            this.setSelected(gameAction.currentSelection);
-            this.setDone(true);
+            if ((gameAction.currentSelection.getValue() - 1) * Utilities.SPACESHIP_MULT > SpaceShooterGame.highestScore)
+                SpaceShooterGame.playMenuHoveringBeep();
+            else{
+                ssSelectionBeep.play();
+                this.setSelected(gameAction.currentSelection);
+                this.setDone(true);
+                return;
+            }
         }
         else if (Commands.hasCommand(Commands.Command.ESCAPE)){
             SpaceShooterGame.playMenuSelectionBeep();
             this.setSelected(ModelSelector.SCIFI_UNDFINED);
             this.setDone(true);
+            return;
         }
         
         if (Gdx.input.justTouched()){
@@ -53,9 +59,13 @@ public class SpaceshipSelectionScreen extends BaseScreen{
             }
             else if (xCoord >= Utilities.GAME_WIDTH * 0.3f
                     && xCoord <= Utilities.GAME_WIDTH * 0.7f){
-                ssSelectionBeep.play();
-                this.setSelected(gameAction.currentSelection);
-                this.setDone(true);            
+                if ((gameAction.currentSelection.getValue() - 1) * Utilities.SPACESHIP_MULT > SpaceShooterGame.highestScore)
+                    SpaceShooterGame.playMenuHoveringBeep();
+                else {
+                    ssSelectionBeep.play();
+                    this.setSelected(gameAction.currentSelection);
+                    this.setDone(true);
+                }
             }
         }
         

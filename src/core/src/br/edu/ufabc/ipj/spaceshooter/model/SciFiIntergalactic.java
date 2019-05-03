@@ -9,7 +9,7 @@ import com.badlogic.gdx.math.Vector3;
 
 public class SciFiIntergalactic extends AbstractModel{
     
-    public static float DEFAULT_SCALE = 0.017f;
+    public static float DEFAULT_SCALE = 0.013f;
     public static float SHOT_RELOAD_TIME = 2;
     
     public static boolean USES_MISSILE = true;

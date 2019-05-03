@@ -126,7 +126,7 @@ public class GameRenderer {
             switchTimer += delta;
             
             if (switchTimer <= 0.5){
-                spriteBatch.setColor(1.0f, 1.0f, 1.0f, 0.25f);
+                spriteBatch.setColor(1.0f, 1.0f, 1.0f, 0.15f);
                 
                 spriteBatch.draw(aimTexture,
                         (Utilities.GAME_WIDTH - 512) * 0.5f, (Utilities.GAME_HEIGHT - 512) * 0.5f,

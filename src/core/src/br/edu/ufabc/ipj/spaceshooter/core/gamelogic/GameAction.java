@@ -292,7 +292,7 @@ public class GameAction {
                         
                         objects.first().getGameObject().setVisible(false);
                         if (SpaceShooterGame.highestScore < this.score)
-                            SpaceShooterGame.highestScore = this.score;
+                            SpaceShooterGame.setNewHighScore(this.score);
                         
                         sExplosionEffect.translate(sShipPos);
                         sExplosionEffect.init();

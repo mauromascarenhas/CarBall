@@ -9,7 +9,7 @@ import com.badlogic.gdx.math.Vector3;
 
 public class SciFiFighter extends AbstractModel{
     
-    public static float DEFAULT_SCALE = 0.9f;
+    public static float DEFAULT_SCALE = 0.8f;
     public static float SHOT_RELOAD_TIME = 1.5f;
     
     public static boolean USES_MISSILE = true;
